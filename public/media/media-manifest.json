@@ -1,0 +1,27 @@
+{
+  "name": "Lumo demo media assets",
+  "language": "zh-CN",
+  "files": [
+    {
+      "type": "image",
+      "path": "/media/lumo-card-ui-generated.png",
+      "description": "Image-2 生成的高质感资料卡片列表视觉"
+    },
+    {
+      "type": "video",
+      "path": "/media/lumo-demo.mp4",
+      "fallback": "/media/lumo-demo.gif",
+      "description": "视频样例：从收藏到成果的动态流程"
+    },
+    {
+      "type": "audio",
+      "path": "/media/lumo-briefing.wav",
+      "description": "音频样例：Lumo 简报提示音"
+    },
+    {
+      "type": "text",
+      "path": "/media/lumo-research-note.txt",
+      "description": "文本样例：可进入研究工作流的本地资料"
+    }
+  ]
+}
