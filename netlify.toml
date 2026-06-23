@@ -1,5 +1,5 @@
 [build]
-  command = "corepack pnpm build"
+  command = "pnpm build"
   publish = "dist"
 
 [[redirects]]

@@ -1,0 +1,40 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="body" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(96 70) rotate(58) scale(160 142)">
+      <stop offset="0" stop-color="#8BE8FF"/>
+      <stop offset="0.34" stop-color="#2F8CFF"/>
+      <stop offset="0.72" stop-color="#183CBE"/>
+      <stop offset="1" stop-color="#091B58"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="67" y1="68" x2="190" y2="204" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#CFF9FF"/>
+      <stop offset="0.5" stop-color="#6AB9FF"/>
+      <stop offset="1" stop-color="#0C2F9C"/>
+    </linearGradient>
+    <radialGradient id="gloss" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(91 74) rotate(53) scale(62 31)">
+      <stop stop-color="#FFFFFF" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="26" y="38" width="204" height="204" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#071853" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <ellipse cx="128" cy="217" rx="62" ry="14" fill="#071853" opacity="0.16"/>
+  <g filter="url(#shadow)">
+    <path d="M128 47C172 47 199 87 204 127C211 180 177 208 130 208C82 208 48 180 53 128C57 84 84 47 128 47Z" fill="url(#body)"/>
+    <path d="M128 53C168 53 192 89 197 128C203 174 174 200 130 200C86 200 60 174 61 129C62 88 88 53 128 53Z" stroke="url(#rim)" stroke-width="9" stroke-linecap="round" opacity="0.78"/>
+    <path d="M65 124C67 87 91 58 127 58" stroke="#E6FCFF" stroke-width="11" stroke-linecap="round" opacity="0.48"/>
+    <ellipse cx="93" cy="76" rx="35" ry="18" fill="url(#gloss)" transform="rotate(-27 93 76)"/>
+    <ellipse cx="104" cy="129" rx="29" ry="35" fill="#F8FDFF"/>
+    <ellipse cx="152" cy="129" rx="29" ry="35" fill="#F8FDFF"/>
+    <ellipse cx="112" cy="136" rx="9" ry="16" fill="#162033"/>
+    <ellipse cx="144" cy="136" rx="9" ry="16" fill="#162033"/>
+    <circle cx="108" cy="126" r="4" fill="#FFFFFF"/>
+    <circle cx="140" cy="126" r="4" fill="#FFFFFF"/>
+    <path d="M116 164C123 171 134 171 141 164" stroke="#DFF7FF" stroke-width="7" stroke-linecap="round"/>
+    <ellipse cx="79" cy="154" rx="20" ry="13" fill="#FF8AC6" opacity="0.44"/>
+    <ellipse cx="177" cy="154" rx="20" ry="13" fill="#FF8AC6" opacity="0.36"/>
+    <path d="M173 85C183 94 189 106 191 121" stroke="#B6EEFF" stroke-width="7" stroke-linecap="round" opacity="0.42"/>
+    <circle cx="184" cy="74" r="5" fill="#EFFFFF" opacity="0.88"/>
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="body" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(94 67) rotate(58) scale(160 143)">
+      <stop offset="0" stop-color="#BFE7FF"/>
+      <stop offset="0.34" stop-color="#5F79FF"/>
+      <stop offset="0.72" stop-color="#262B8F"/>
+      <stop offset="1" stop-color="#080A2C"/>
+    </radialGradient>
+    <linearGradient id="cape" x1="66" y1="157" x2="190" y2="215" gradientUnits="userSpaceOnUse"><stop stop-color="#2C1E7F"/><stop offset="1" stop-color="#10112F"/></linearGradient>
+    <filter id="shadow" x="24" y="32" width="208" height="210" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="18" stdDeviation="14" flood-color="#11113F" flood-opacity="0.3"/></filter>
+  </defs>
+  <ellipse cx="128" cy="217" rx="62" ry="14" fill="#070725" opacity="0.2"/>
+  <g filter="url(#shadow)">
+    <path d="M128 48C173 48 200 88 204 128C210 180 177 208 130 208C82 208 49 181 54 129C58 86 85 48 128 48Z" fill="url(#body)"/>
+    <path d="M66 174C88 202 166 204 190 174C178 212 84 214 66 174Z" fill="url(#cape)" stroke="#05061D" stroke-width="6"/>
+    <path d="M111 52L121 34L132 52L152 55L138 69L141 90L122 80L104 90L108 69L93 55L111 52Z" fill="#FFE58A" stroke="#8A5A00" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M67 123C70 87 94 60 128 58" stroke="#EEF5FF" stroke-width="11" stroke-linecap="round" opacity="0.42"/>
+    <ellipse cx="104" cy="129" rx="29" ry="35" fill="#F8FDFF"/>
+    <ellipse cx="152" cy="129" rx="29" ry="35" fill="#F8FDFF"/>
+    <ellipse cx="112" cy="136" rx="9" ry="16" fill="#111827"/>
+    <ellipse cx="144" cy="136" rx="9" ry="16" fill="#111827"/>
+    <circle cx="108" cy="126" r="4" fill="#FFFFFF"/>
+    <circle cx="140" cy="126" r="4" fill="#FFFFFF"/>
+    <path d="M116 164C123 171 134 171 141 164" stroke="#EAF2FF" stroke-width="7" stroke-linecap="round"/>
+    <path d="M185 82L189 90L198 91L191 97L193 106L185 101L177 106L179 97L172 91L181 90L185 82Z" fill="#FFE58A"/>
+    <circle cx="83" cy="95" r="4" fill="#FFE58A" opacity="0.88"/>
+    <circle cx="180" cy="146" r="3" fill="#F8FAFC" opacity="0.86"/>
+    <circle cx="91" cy="169" r="3" fill="#FDE68A" opacity="0.9"/>
+  </g>
+</svg>

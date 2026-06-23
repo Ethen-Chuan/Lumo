@@ -3,8 +3,13 @@ import type { DeliverableType, Purpose, SourceStatus, SourceType, TriageStatus }
 export const titleCase = (value: string) =>
   value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 
-export const formatDate = (value: string) =>
-  new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(value));
+export const formatDate = (value: string) => {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
 
 const purposeMap: Record<Purpose, string> = {
   later_reading: "稍后阅读",

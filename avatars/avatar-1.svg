@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5b6af0"/>
+      <stop offset="100%" stop-color="#3a4bd1"/>
+    </linearGradient>
+    <clipPath id="circle">
+      <circle cx="200" cy="200" r="200"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="200" fill="url(#bg)"/>
+
+  <!-- Light reflection -->
+  <ellipse cx="200" cy="60" rx="140" ry="50" fill="rgba(255,255,255,0.14)"/>
+
+  
+
+  <!-- Blob body -->
+  <g clip-path="url(#circle)">
+    <ellipse cx="200" cy="460" rx="185" ry="220" fill="#0d1340"/>
+  </g>
+
+  <!-- Left eye white -->
+  <circle cx="144" cy="268" r="38" fill="white"/>
+  <circle cx="150" cy="274" r="22" fill="#0d0d1a"/>
+  <circle cx="140" cy="262" r="8" fill="white" opacity="0.9"/>
+
+  <!-- Right eye white -->
+  <circle cx="256" cy="268" r="38" fill="white"/>
+  <circle cx="262" cy="274" r="22" fill="#0d0d1a"/>
+  <circle cx="252" cy="262" r="8" fill="white" opacity="0.9"/>
+</svg>

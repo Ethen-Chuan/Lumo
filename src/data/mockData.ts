@@ -15,87 +15,166 @@ const now = "2026-05-29T09:00:00.000Z";
 const daysAgo = (days: number) => new Date(Date.parse(now) - days * 86400000).toISOString();
 
 const sourceSeed = [
-  ["s1", "CeraVe Hydrating Facial Cleanser 官方产品页", "CeraVe", "article", "competitor_analysis", "CeraVe 洗面奶调研"],
-  ["s2", "CeraVe 洁面核心卖点与适用肤质拆解", "CeraVe", "webpage", "project_research", "CeraVe 洗面奶调研"],
-  ["s3", "Ulta 用户问答：敏感肌、卸妆与适用边界", "Ulta", "webpage", "project_research", "CeraVe 洗面奶调研"],
-  ["s4", "Target 货架：保湿洁面价格与相邻竞品", "Target", "webpage", "competitor_analysis", "CeraVe 洗面奶调研"],
-  ["s5", "INCI Decoder 成分证据：神经酰胺与透明质酸", "INCI Decoder", "article", "competitor_analysis", "CeraVe 洗面奶调研"],
-  ["s6", "The next wave of AI read-it-later tools", "Lumo Research", "article", "project_research", "AI Reading Tools"],
-  ["s7", "Personal knowledge management fails after collection", "PKM Weekly", "newsletter", "learning", "Knowledge Management"],
-  ["s8", "Information overload and attention triage", "Research Notes", "pdf", "learning", "Knowledge Management"],
-  ["s9", "Highlight and note patterns for serious readers", "Reader Lab", "article", "writing_material", "Knowledge Management"],
-  ["s10", "Web snapshot reliability for research archives", "Archive Lab", "article", "task_reference", "Knowledge Management"],
-  ["s11", "Import and export expectations across knowledge tools", "Ops Notes", "note", "task_reference", "Product Management"],
-  ["s12", "RAG Q&A from saved sources: product constraints", "AI Systems", "article", "project_research", "Product Management"],
-  ["s13", "Product manager competitive analysis workflow", "PM Library", "article", "interview_prep", "Product Management"],
-  ["s14", "Writing AI product PRDs with evidence", "PM School", "article", "interview_prep", "Product Management"],
-  ["s15", "Industrial AI platform messaging analysis", "Industrial AI Review", "pdf", "project_research", "Industrial AI"],
-  ["s16", "Interview material organization for AI PM roles", "Career Desk", "note", "interview_prep", "Interview Prep"],
-  ["s17", "Lumo audio briefing: from saved sources to deliverables", "Lumo Studio", "audio", "project_research", "AI Reading Tools"],
+  ["s1", "CeraVe 保湿洁面：官方定位与成分卖点", "CeraVe", "article", "competitor_analysis", "跨行业产品研究"],
+  ["s2", "Duolingo 连续学习机制与留存增长拆解", "Duolingo", "webpage", "project_research", "跨行业产品研究"],
+  ["s3", "Notion AI：知识工作台的 AI 功能包装", "Notion", "webpage", "competitor_analysis", "跨行业产品研究"],
+  ["s4", "DJI Osmo Pocket 3：创作者设备的场景卖点", "DJI", "video", "writing_material", "跨行业产品研究"],
+  ["s5", "Airbnb Rooms：信任机制与供给侧体验更新", "Airbnb", "article", "project_research", "跨行业产品研究"],
+  ["s6", "Spotify Wrapped：年度回顾的社交传播机制", "Spotify", "article", "writing_material", "内容增长"],
+  ["s7", "Figma Community：设计生态与模板复用", "Figma", "webpage", "inspiration", "设计生态"],
+  ["s8", "Stripe Billing：开发者文档里的商业转化路径", "Stripe", "webpage", "task_reference", "开发者工具"],
+  ["s9", "IKEA 样板间：零售空间动线与组合购买", "IKEA", "image", "inspiration", "零售空间"],
+  ["s10", "Nike Run Club：训练计划与运动激励", "Nike", "video", "learning", "运动健康"],
+  ["s11", "Headspace 睡眠旅程：课程化留存与情绪照顾", "Headspace", "audio", "learning", "心理健康"],
+  ["s12", "Slack Canvas：异步协作文档如何沉淀行动", "Slack", "webpage", "project_research", "团队协作"],
+  ["s13", "Shopify Checkout：电商结账信任与转化设计", "Shopify", "article", "competitor_analysis", "电商转化"],
+  ["s14", "Linear Roadmap：Issue、Cycle 与发布节奏", "Linear", "webpage", "project_research", "项目管理"],
+  ["s15", "Tesla Supercharger：补能网络的路线体验", "Tesla", "pdf", "project_research", "出行能源"],
+  ["s16", "Patagonia Worn Wear：维修、二手与品牌信任", "Patagonia", "note", "interview_prep", "可持续品牌"],
+  ["s17", "Apple Vision Pro：空间计算的新手引导", "Apple", "audio", "project_research", "空间计算"],
 ] as const;
 
 const realUrls: Record<string, string> = {
   s1: "https://www.cerave.com/skincare/cleansers/hydrating-facial-cleanser",
-  s2: "https://www.cerave.com/skincare/cleansers/hydrating-facial-cleanser",
-  s3: "https://www.ulta.com/p/hydrating-facial-cleanser-xlsImpprod4190255",
-  s4: "https://www.target.com/p/-/A-13977968",
-  s5: "https://incidecoder.com/products/cerave-hydrating-cleanser-2",
+  s2: "https://blog.duolingo.com/streak/",
+  s3: "https://www.notion.com/product/ai",
+  s4: "https://www.dji.com/osmo-pocket-3",
+  s5: "https://news.airbnb.com/airbnb-rooms/",
+  s6: "https://newsroom.spotify.com/wrapped/",
+  s7: "https://www.figma.com/community/",
+  s8: "https://docs.stripe.com/billing",
+  s9: "https://www.ikea.com/us/en/rooms/",
+  s10: "https://www.nike.com/nrc-app",
+  s11: "https://www.headspace.com/",
+  s12: "https://slack.com/features/canvas",
+  s13: "https://www.shopify.com/checkout",
+  s14: "https://linear.app/product",
+  s15: "https://www.tesla.com/supercharger",
+  s16: "https://wornwear.patagonia.com/",
+  s17: "https://www.apple.com/apple-vision-pro/",
 };
 
-const cleanserContent: Record<string, string[]> = {
+const demoContent: Record<string, string[]> = {
   s1: [
-    "这篇资料来自 CeraVe 官方产品页，适合当作产品定位的一手出处。页面把 Hydrating Facial Cleanser 放在温和保湿洁面的语境里，面向偏干或普通肤质，重点不是强去油，而是日常清洁后的舒适肤感。",
-    "官方卖点可以拆成三层：第一层是清洁任务，即去除日常污垢和油脂；第二层是肤感任务，即清洁后降低干燥和紧绷；第三层是屏障叙事，即用神经酰胺和透明质酸连接到保湿与屏障维护。",
-    "如果把它写成详情页文案，主标题不应该只说“洗得干净”，而应强调“温和清洁、不拔干、保湿型洁面”。这能直接回应干皮用户对洗后紧绷的担忧。",
-    "Lumo 可抽取的 Claim：CeraVe Hydrating Facial Cleanser 的核心差异不是泡沫感或强清洁，而是把温和清洁、保湿肤感和屏障友好放在同一个购买理由里。",
+    "CeraVe 官方产品页适合当作美妆个护研究的一手出处。它的核心不是强清洁，而是温和清洁、洗后不紧绷和屏障友好，适合拆成详情页卖点和 FAQ。",
+    "官方卖点可以拆成三层：清洁任务、肤感任务和屏障叙事。神经酰胺与透明质酸适合支撑保湿表达，但不能被写成治疗承诺。",
+    "Lumo 可抽取的 Claim：保湿型洁面的主叙事应围绕使用后的舒适感，而不是泡沫多少或强去油能力。",
     "出处：CeraVe 官方产品页 https://www.cerave.com/skincare/cleansers/hydrating-facial-cleanser",
   ],
   s2: [
-    "这篇资料继续使用 CeraVe 官方产品页，但阅读目标换成“卖点拆解”。适合把页面中的功能性表述整理成详情页标签、FAQ 和短视频脚本。",
-    "可提取的卖点包括无添加香精、非致痘、MVE 相关保湿释放叙事，以及和皮肤屏障有关的成分逻辑。这些内容适合放在页面第一屏下方的卖点条或成分解释模块里。",
-    "表达边界同样重要。无香精、非致痘、温和等信息可以支撑低刺激和日常使用，但不能被写成治疗皮肤问题的医疗承诺。",
-    "Lumo 可抽取的 Evidence：官方页面提供了详情页可复用的卖点词库，但每个词都需要在文案中保留适用边界，避免从护肤品表达滑向药品表达。",
-    "出处：CeraVe 官方产品页 https://www.cerave.com/skincare/cleansers/hydrating-facial-cleanser",
+    "Duolingo 的连续学习机制适合作为增长产品案例。它把学习目标拆成每日小任务，用 streak、提醒和奖励把用户从一次性学习引导到长期习惯。",
+    "值得观察的不是单个徽章，而是整套行为闭环：触发、完成、反馈、损失厌恶和社交展示。这些机制共同降低了用户第二天回来的心理成本。",
+    "Lumo 可抽取的 Insight：教育产品的留存增长不只靠内容质量，也依赖把学习行为设计成低门槛、可见进度和有损失感的日常循环。",
+    "出处：Duolingo Blog https://blog.duolingo.com/streak/",
   ],
   s3: [
-    "Ulta 零售页适合用来观察购买前问题。和官方页相比，零售渠道更接近真实用户的决策现场：用户会问适用肤质、是否适合敏感肌、能不能卸妆、组合肌能不能用，以及和其他洁面的区别。",
-    "这些问题说明消费者并不只看成分表。对于一款温和保湿洁面，用户真正需要的是使用边界：它适合谁、解决什么、不解决什么、什么时候需要搭配卸妆产品。",
-    "详情页 FAQ 可以围绕三个问题写：干皮/普通肤质为什么适合；它是否等于卸妆；如果用户想要泡沫感或控油，是否应该选择其他线。",
-    "Lumo 可抽取的 Insight：用户疑虑集中在“温和是否等于洗不干净”和“保湿洁面是否能覆盖卸妆/控油场景”，内容策略应主动解释边界。",
-    "出处：Ulta 产品页 https://www.ulta.com/p/hydrating-facial-cleanser-xlsImpprod4190255",
+    "Notion AI 的页面适合研究 AI 办公产品如何包装能力。它没有只强调模型参数，而是把 AI 嵌入文档、搜索、总结和写作流程里。",
+    "这类产品的关键表达是减少上下文切换：用户不用离开工作台，就能把会议记录、项目资料和知识库内容转成下一步动作。",
+    "Lumo 可抽取的 Claim：AI 办公产品的价值应从具体工作流解释，而不是把“AI”本身当作卖点。",
+    "出处：Notion AI 产品页 https://www.notion.com/product/ai",
   ],
   s4: [
-    "Target 货架页适合做竞品场景分析。用户并不是单独看到 CeraVe Hydrating Facial Cleanser，而是在同一页面或同一货架上与泡沫洁面、敏感肌洁面、酸类洁面以及其他品牌温和洁面对比。",
-    "这会形成几个真实取舍：想要保湿的人可能选 Hydrating；想要更清爽泡沫感的人可能转向 Foaming；有痘痘或角质诉求的人会看 SA 类；敏感肌用户可能会比较 Vanicream 或 La Roche-Posay。",
-    "竞品矩阵应记录产品、品牌、适用肤质、主成分、价格带、清洁感、潜在风险和详情页主叙事，而不是只记录价格。",
-    "Lumo 可抽取的 Evidence：Target 货架能证明用户会在同价位相邻产品中做选择，因此产品文案必须清楚解释“保湿型洁面”和“泡沫/控油型洁面”的差别。",
-    "出处：Target 产品页 https://www.target.com/p/-/A-13977968",
+    "DJI Osmo Pocket 3 适合做创作者硬件的场景研究。它的卖点不是单纯参数，而是把便携、稳定、对焦、收音和竖屏内容生产放进 vlog 工作流。",
+    "创作者设备的详情页需要回答：一个人能不能快速开拍、运动中画面是否稳定、低光下是否可用、素材能否快速进入剪辑流程。",
+    "Lumo 可抽取的 Evidence：硬件卖点需要落到拍摄场景和创作链路，否则参数很难转化为购买理由。",
+    "出处：DJI Osmo Pocket 3 https://www.dji.com/osmo-pocket-3",
   ],
   s5: [
-    "INCI Decoder 成分页适合作为第三方成分解释来源。它不能替代官方资料，但能帮助把成分表转成更易读的证据语言，适合支持成分教育模块。",
-    "在这条资料里，神经酰胺和透明质酸可以用来支撑“保湿”和“屏障友好”的叙事，但应避免把成分存在直接写成确定性功效。",
-    "最稳妥的写法是：官方页负责产品定位和品牌承诺，第三方成分页负责解释成分为什么与保湿、屏障叙事相关，两者交叉后再进入简报。",
-    "Lumo 可抽取的 Evidence：成分解释能补强官方卖点，但生成内容时必须保留“护肤品表达”的边界，避免夸大为治疗效果。",
-    "出处：INCI Decoder 成分页 https://incidecoder.com/products/cerave-hydrating-cleanser-2",
+    "Airbnb Rooms 适合研究平台型产品如何重建信任。它不是只增加一个房源分类，而是通过房东资料、筛选和展示方式降低住客对合住场景的不确定性。",
+    "平台产品的体验更新通常同时影响供给和需求：住客需要安全感，房东需要被准确理解，平台需要把匹配效率和信任信号一起展示。",
+    "Lumo 可抽取的 Insight：服务平台的核心改版往往不是界面变化，而是重新设计信任信号和交易前的信息透明度。",
+    "出处：Airbnb Newsroom https://news.airbnb.com/airbnb-rooms/",
+  ],
+  s6: [
+    "Spotify Wrapped 适合研究内容产品的年度回顾机制。它把用户行为数据转成可分享的身份表达，传播动机来自个性化、仪式感和社交货币。",
+    "Lumo 可抽取的 Evidence：增长内容不一定要靠新功能，也可以把已有数据重新包装成用户愿意展示的故事。",
+    "出处：Spotify Newsroom https://newsroom.spotify.com/wrapped/",
+  ],
+  s7: [
+    "Figma Community 适合研究设计工具如何通过模板、插件和公开文件建立生态。用户不只是使用工具，也在复用他人的工作流。",
+    "Lumo 可抽取的 Claim：生产力工具的护城河可以来自社区供给和可复用资产，而不只是编辑器能力。",
+    "出处：Figma Community https://www.figma.com/community/",
+  ],
+  s8: [
+    "Stripe Billing 的文档适合研究开发者工具如何把复杂商业流程拆成清晰路径：订阅、发票、试用、失败重试和报表。",
+    "Lumo 可抽取的 Evidence：B2B 工具的转化往往发生在文档里，信息架构本身就是产品体验。",
+    "出处：Stripe Docs https://docs.stripe.com/billing",
+  ],
+  s9: [
+    "IKEA 样板间适合研究零售空间如何用场景启发购买。用户看到的不是单件商品，而是一套可复制的生活方案。",
+    "Lumo 可抽取的 Insight：线下零售的动线、搭配和空间叙事，可以转译成线上内容和组合推荐。",
+    "出处：IKEA Rooms https://www.ikea.com/us/en/rooms/",
+  ],
+  s10: [
+    "Nike Run Club 适合研究运动健康产品如何降低开始训练的心理门槛。训练计划、教练语音、徽章和社群反馈共同支撑坚持。",
+    "Lumo 可抽取的 Claim：健康产品的关键不是提醒用户自律，而是把目标拆成可完成的小阶段。",
+    "出处：Nike Run Club https://www.nike.com/nrc-app",
+  ],
+  s11: [
+    "Headspace 适合研究心理健康产品的课程化体验。睡眠、呼吸和冥想内容通过温和提醒和进度感形成低压力习惯。",
+    "Lumo 可抽取的 Evidence：情绪类产品的语气、节奏和安全感，是和功能同等重要的体验证据。",
+    "出处：Headspace https://www.headspace.com/",
+  ],
+  s12: [
+    "Slack Canvas 适合研究团队协作里的异步沉淀。它把聊天中的上下文、决策和行动项整理成可持续更新的工作文档。",
+    "Lumo 可抽取的 Insight：协作产品的价值不只在沟通速度，也在能否把沟通转成组织记忆。",
+    "出处：Slack Canvas https://slack.com/features/canvas",
+  ],
+  s13: [
+    "Shopify Checkout 适合研究电商转化。结账页需要同时解决速度、支付选择、信任、安全和错误恢复。",
+    "Lumo 可抽取的 Evidence：高转化流程不是减少信息，而是把必要信息放在用户最需要判断的位置。",
+    "出处：Shopify Checkout https://www.shopify.com/checkout",
+  ],
+  s14: [
+    "Linear 适合研究项目管理产品如何组织节奏。Issue、Cycle、Roadmap 和发布计划把团队注意力从散乱任务拉回优先级。",
+    "Lumo 可抽取的 Claim：项目管理工具的核心不是堆字段，而是让团队更容易判断下一步。",
+    "出处：Linear Product https://linear.app/product",
+  ],
+  s15: [
+    "Tesla Supercharger 适合研究出行能源网络体验。用户关心的不只是充电速度，还包括路线规划、可用性、等待时间和可靠性。",
+    "Lumo 可抽取的 Insight：基础设施型产品需要把物理网络、地图信息和用户焦虑一起设计。",
+    "出处：Tesla Supercharger https://www.tesla.com/supercharger",
+  ],
+  s16: [
+    "Patagonia Worn Wear 适合研究可持续品牌如何把维修、二手和故事变成信任机制。它让产品生命周期成为品牌表达的一部分。",
+    "Lumo 可抽取的 Evidence：可持续不是单句口号，需要可执行的维修、回收、二手交易和社区故事支撑。",
+    "出处：Patagonia Worn Wear https://wornwear.patagonia.com/",
+  ],
+  s17: [
+    "Apple Vision Pro 适合研究新交互范式的新手引导。空间窗口、眼动、手势和沉浸场景需要被解释成普通用户能理解的任务。",
+    "Lumo 可抽取的 Claim：新硬件的教育成本很高，首屏体验必须先回答它能替用户完成什么。",
+    "出处：Apple Vision Pro https://www.apple.com/apple-vision-pro/",
   ],
 };
 
-const cleanserReferences: Record<string, Source["sourceReferences"]> = {
-  s1: [{ label: "CeraVe 官方产品页", url: realUrls.s1, note: "用于确认产品定位、适用肤质、核心成分和官方卖点。" }],
-  s2: [{ label: "CeraVe 官方产品页", url: realUrls.s2, note: "用于拆解无香精、非致痘、MVE 技术等详情页卖点。" }],
-  s3: [{ label: "Ulta 产品页", url: realUrls.s3, note: "用于观察零售渠道用户问答、购买前疑虑和使用边界。" }],
-  s4: [{ label: "Target 产品页", url: realUrls.s4, note: "用于观察价格、货架相邻产品和竞品选择场景。" }],
-  s5: [{ label: "INCI Decoder 成分页", url: realUrls.s5, note: "用于解释成分表，并和官方卖点交叉验证。" }],
+const demoReferences: Record<string, Source["sourceReferences"]> = {
+  s1: [{ label: "CeraVe 官方产品页", url: realUrls.s1, note: "用于确认美妆产品定位、适用肤质、核心成分和官方卖点。" }],
+  s2: [{ label: "Duolingo Streak 机制", url: realUrls.s2, note: "用于研究教育产品的习惯养成、提醒和留存机制。" }],
+  s3: [{ label: "Notion AI 产品页", url: realUrls.s3, note: "用于研究 AI 办公产品如何把能力嵌入知识工作流。" }],
+  s4: [{ label: "DJI Osmo Pocket 3", url: realUrls.s4, note: "用于研究创作者硬件的场景卖点和内容生产流程。" }],
+  s5: [{ label: "Airbnb Rooms 发布资料", url: realUrls.s5, note: "用于研究平台产品的信任信号、供需匹配和体验改版。" }],
+  s6: [{ label: "Spotify Wrapped", url: realUrls.s6, note: "用于研究内容产品如何把用户数据包装成可分享故事。" }],
+  s7: [{ label: "Figma Community", url: realUrls.s7, note: "用于研究设计工具的社区供给、模板复用和插件生态。" }],
+  s8: [{ label: "Stripe Billing Docs", url: realUrls.s8, note: "用于研究开发者文档、计费流程和 B2B 转化路径。" }],
+  s9: [{ label: "IKEA Rooms", url: realUrls.s9, note: "用于研究零售空间、样板间动线和组合购买场景。" }],
+  s10: [{ label: "Nike Run Club", url: realUrls.s10, note: "用于研究运动健康产品的训练计划、激励和社群反馈。" }],
+  s11: [{ label: "Headspace", url: realUrls.s11, note: "用于研究心理健康产品的课程化体验和温和留存。" }],
+  s12: [{ label: "Slack Canvas", url: realUrls.s12, note: "用于研究异步协作、组织记忆和行动项沉淀。" }],
+  s13: [{ label: "Shopify Checkout", url: realUrls.s13, note: "用于研究电商结账页的信任、支付和转化设计。" }],
+  s14: [{ label: "Linear Product", url: realUrls.s14, note: "用于研究项目管理工具的 issue、cycle 和路线图节奏。" }],
+  s15: [{ label: "Tesla Supercharger", url: realUrls.s15, note: "用于研究出行能源网络、路线规划和可用性体验。" }],
+  s16: [{ label: "Patagonia Worn Wear", url: realUrls.s16, note: "用于研究可持续品牌的维修、二手和信任机制。" }],
+  s17: [{ label: "Apple Vision Pro", url: realUrls.s17, note: "用于研究新硬件和空间交互的新手引导。" }],
 };
 
 const localDemoSource = "/media/lumo-research-note.txt";
 
 export const collections: Collection[] = [
-  { id: "c1", name: "CeraVe 洗面奶调研", description: "官方卖点、成分证据、零售货架和用户疑问。", sourceIds: ["s1", "s2", "s3", "s4", "s5"], tags: ["cleanser", "skincare", "competitive"], createdAt: daysAgo(35), updatedAt: daysAgo(1) },
-  { id: "c2", name: "Product Management", description: "PRD, research, evidence, and PM workflow material.", sourceIds: ["s11", "s12", "s13", "s14"], tags: ["pm", "prd"], createdAt: daysAgo(28), updatedAt: daysAgo(2) },
-  { id: "c3", name: "Knowledge Management", description: "PKM, highlights, notes, retrieval, and review loops.", sourceIds: ["s7", "s8", "s9", "s10"], tags: ["pkm", "notes"], createdAt: daysAgo(25), updatedAt: daysAgo(3) },
-  { id: "c4", name: "Interview Prep", description: "Stories and structured material for AI PM interviews.", sourceIds: ["s13", "s14", "s16"], tags: ["career", "interview"], createdAt: daysAgo(12), updatedAt: daysAgo(1) },
-  { id: "c5", name: "Industrial AI", description: "Positioning and messaging for industrial AI products.", sourceIds: ["s15"], tags: ["industrial", "messaging"], createdAt: daysAgo(14), updatedAt: daysAgo(4) },
+  { id: "c1", name: "跨行业产品研究样例", description: "美妆、教育增长、AI 办公、创作者硬件和平台服务的多元样例。", sourceIds: ["s1", "s2", "s3", "s4", "s5"], tags: ["product", "growth", "ai", "platform"], createdAt: daysAgo(35), updatedAt: daysAgo(1) },
+  { id: "c2", name: "AI 与协作工具", description: "Notion、Figma、Stripe、Slack、Linear 等工具型产品样例。", sourceIds: ["s3", "s7", "s8", "s12", "s14"], tags: ["ai", "tools", "workflow"], createdAt: daysAgo(28), updatedAt: daysAgo(2) },
+  { id: "c3", name: "增长与消费产品", description: "Duolingo、Spotify、IKEA、Nike、Headspace 的增长和体验样例。", sourceIds: ["s2", "s6", "s9", "s10", "s11"], tags: ["growth", "consumer"], createdAt: daysAgo(25), updatedAt: daysAgo(3) },
+  { id: "c4", name: "商业模式与品牌", description: "Shopify、Tesla、Patagonia 等商业机制和品牌信任案例。", sourceIds: ["s13", "s15", "s16"], tags: ["commerce", "brand"], createdAt: daysAgo(12), updatedAt: daysAgo(1) },
+  { id: "c5", name: "新硬件与平台体验", description: "DJI、Airbnb、Apple Vision Pro 等硬件和平台服务案例。", sourceIds: ["s4", "s5", "s17"], tags: ["hardware", "platform"], createdAt: daysAgo(14), updatedAt: daysAgo(4) },
 ];
 
 export const sources: Source[] = sourceSeed.map(([id, title, sourceName, type, purpose], index) => {
@@ -106,7 +185,7 @@ export const sources: Source[] = sourceSeed.map(([id, title, sourceName, type, p
     title,
     url: realUrls[id] ?? localDemoSource,
     sourceName,
-    sourceReferences: cleanserReferences[id] ?? [{ label: "Lumo 本地样例文本", url: localDemoSource, note: "本地演示资料，不伪装成外部文章；真实项目可替换为导入文章的原始链接。" }],
+    sourceReferences: demoReferences[id] ?? [{ label: "Lumo 本地样例文本", url: localDemoSource, note: "本地演示资料，不伪装成外部文章；真实项目可替换为导入文章的原始链接。" }],
     type,
     status: index < 5 ? "inbox" : index < 11 ? "unread" : index < 14 ? "read" : "archived",
     triageStatus: index % 4 === 0 ? "must_read" : index % 4 === 1 ? "project_material" : index % 4 === 2 ? "skim" : "archive_suggested",
@@ -121,28 +200,28 @@ export const sources: Source[] = sourceSeed.map(([id, title, sourceName, type, p
     readingProgress: index % 3 === 0 ? 100 : index % 3 === 1 ? 42 : 0,
     hasSnapshot: index % 5 !== 0,
     snapshotStatus: index % 5 === 0 ? "pending" : "saved",
-    summary: cleanserContent[id]
-      ? `${title} 可用于 CeraVe Hydrating Facial Cleanser 的产品调研，帮助拆解卖点、用户疑虑、竞品位置和证据链。`
+    summary: demoContent[id]
+      ? `${title} 可用于跨行业产品研究，帮助拆解定位、增长机制、场景卖点、信任信号和证据链。`
       : `${title} explains how capture, reading, annotation, and later retrieval shape the user's ability to turn saved material into decisions.`,
-    aiReason: cleanserContent[id]
-      ? "这条资料包含可复用的产品研究证据，建议先阅读并抽取 Claim / Evidence。"
+    aiReason: demoContent[id]
+      ? "这条资料代表一个不同类型的产品问题，建议先阅读并抽取 Claim / Evidence，避免示例集中在单一行业。"
       : index % 4 === 3 ? "This source overlaps with older notes, so Lumo suggests archiving unless it supports an active project." : "This source contains reusable product evidence and should be reviewed before the next research synthesis.",
-    readingRecommendation: cleanserContent[id]
-      ? "先高亮核心卖点或用户疑问，再转成证据并加入 CeraVe 洗面奶调研项目。"
+    readingRecommendation: demoContent[id]
+      ? "先高亮产品机制、用户疑虑或场景证据，再转成观点并加入跨行业研究项目。"
       : index % 2 ? "Skim for positioning language, then extract the strongest claim." : "Read fully and convert the most specific paragraph into evidence.",
-    keyPoints: cleanserContent[id]
+    keyPoints: demoContent[id]
       ? [
-          "识别核心卖点、适用人群和使用边界。",
-          "把官方资料与第三方资料交叉验证。",
-          "沉淀成产品定位、FAQ、竞品矩阵和内容脚本。",
+          "识别产品定位、目标用户和关键使用场景。",
+          "把公开资料转成可复用的 Claim / Evidence。",
+          "比较不同行业里的增长、信任、AI 和硬件卖点。",
         ]
       : [
           "Capture must be nearly frictionless or users postpone saving.",
           "Readers need structured outputs, not only pleasant storage.",
           "Evidence should stay connected to the original source and context.",
         ],
-    relatedTopics: cleanserContent[id] ? ["洗面奶", "护肤成分", "竞品分析", "详情页文案"] : ["AI summary", "highlight workflow", "project research", "knowledge review"],
-    content: cleanserContent[id] ?? [
+    relatedTopics: demoContent[id] ? ["产品研究", "增长机制", "AI 办公", "平台信任", "创作者工具"] : ["AI summary", "highlight workflow", "project research", "knowledge review"],
+    content: demoContent[id] ?? [
       "Most knowledge tools solve capture better than synthesis. The result is a growing library that feels useful at the moment of saving but becomes expensive to revisit later.",
       "A strong reader experience starts with clean typography, fast context, visible progress, and low-friction actions for highlighting, note taking, archiving, and search.",
       "The real product opportunity appears after reading. Teams need to turn highlights into claims, claims into evidence chains, and evidence into deliverables that can be shared.",
@@ -219,8 +298,8 @@ export const evidence: Evidence[] = Array.from({ length: 24 }, (_, index) => {
 export const insights: Insight[] = [
   {
     id: "in1",
-    title: "温和保湿是主定位，不是附属卖点",
-    content: "官方页和成分页共同说明，这款洁面的主叙事应围绕“清洁后不拔干、保湿、屏障友好”展开。它不适合用强清洁或泡沫感做第一卖点，否则会偏离干皮和屏障护理人群的购买动机。",
+    title: "多元样例能证明 Lumo 的通用研究能力",
+    content: "首屏不应该连续展示同一品类。把美妆、教育增长、AI 办公、创作者硬件和平台服务放在一起，能更快说明 Lumo 处理的是资料到成果的通用工作流。",
     type: "product_opportunity",
     priority: "high",
     projectId: "p1",
@@ -231,9 +310,9 @@ export const insights: Insight[] = [
   },
   {
     id: "in2",
-    title: "购买疑虑集中在使用边界",
-    content: "Ulta 问答暴露的不是单一成分问题，而是场景边界：能不能卸妆、敏感肌能否用、组合肌会不会闷、泡沫少是否洗得干净。详情页 FAQ 应先回答这些问题，再讲成分。",
-    type: "user_pain",
+    title: "增长案例和商品案例需要不同证据结构",
+    content: "CeraVe 更适合抽取定位、成分和使用边界；Duolingo 更适合抽取行为闭环、提醒和留存机制。两者并列能展示 Lumo 对不同证据类型的适配能力。",
+    type: "learning_summary",
     priority: "high",
     projectId: "p1",
     claimIds: ["cl3", "cl4"],
@@ -243,38 +322,38 @@ export const insights: Insight[] = [
   },
   {
     id: "in3",
-    title: "竞品比较应按肤感和任务分层",
-    content: "Target 货架里的真实选择并不是“哪支洗面奶更好”，而是保湿型、泡沫型、酸类清洁、敏感肌温和清洁各自解决不同任务。竞品矩阵需要把适用肤质、清洁感、价格带和风险分开比较。",
-    type: "competitor_gap",
+    title: "AI 产品应按工作流表达，而不是只强调 AI",
+    content: "Notion AI 这类样例能补足洗面奶案例没有的产品逻辑：AI 能力必须嵌入搜索、写作、总结和项目协作，才会变成可理解的用户价值。",
+    type: "requirement_hypothesis",
     priority: "medium",
     projectId: "p1",
     claimIds: ["cl5"],
     evidenceIds: ["ev5", "ev6"],
-    suggestedDeliverables: ["competitive_analysis"],
+    suggestedDeliverables: ["prd", "research_brief"],
     createdAt: daysAgo(3),
   },
   {
     id: "in4",
-    title: "成分证据能补强卖点，但不能替代功效证明",
-    content: "INCI Decoder 适合解释神经酰胺、透明质酸和配方逻辑，但它只能支撑“保湿、屏障友好”的护肤品表达。生成文案时要避免把成分存在写成确定性治疗效果。",
-    type: "risk",
+    title: "硬件卖点要落到创作场景",
+    content: "DJI 样例能展示 Lumo 对视频、硬件和创作者场景的支持。稳定、防抖、收音和竖屏不是孤立参数，而是短视频生产流程里的证据。",
+    type: "content_angle",
     priority: "high",
     projectId: "p1",
     claimIds: ["cl6"],
     evidenceIds: ["ev7", "ev8"],
-    suggestedDeliverables: ["research_brief", "content_script"],
+    suggestedDeliverables: ["content_script", "competitive_analysis"],
     createdAt: daysAgo(4),
   },
   {
     id: "in5",
-    title: "内容转化应先讲使用场景，再讲成分",
-    content: "短视频和详情页首屏应先呈现用户能感知的结果：洗后不紧绷、适合早晚日常清洁、干皮友好。成分解释放在第二层，用来增强可信度，而不是一开始就堆术语。",
-    type: "content_angle",
+    title: "平台服务案例能补上信任机制维度",
+    content: "Airbnb Rooms 样例让 Demo 不再只围绕实体商品。平台型产品的证据更多来自信任信号、筛选条件、供需匹配和交易前透明度。",
+    type: "market_trend",
     priority: "medium",
     projectId: "p1",
     claimIds: ["cl7", "cl8"],
     evidenceIds: ["ev9", "ev10"],
-    suggestedDeliverables: ["content_script", "research_brief"],
+    suggestedDeliverables: ["research_brief", "weekly_report"],
     createdAt: daysAgo(5),
   },
   {
@@ -340,14 +419,189 @@ export const insights: Insight[] = [
 ];
 
 export const projects: Project[] = [
-  { id: "p1", name: "CeraVe 洗面奶产品调研", description: "围绕温和保湿洁面的官方卖点、成分证据、货架竞品和用户疑问建立研究工作台。", goal: "判断 CeraVe Hydrating Facial Cleanser 的核心定位、购买疑虑、竞品差异和内容转化方向。", keyQuestions: ["核心卖点是什么？", "用户购买前最担心什么？", "它和泡沫洁面/敏感肌洁面怎么区分？", "详情页和短视频应该怎么讲？"], status: "active", sourceIds: ["s1", "s2", "s3", "s4", "s5"], claimIds: claims.slice(0, 8).map((i) => i.id), evidenceIds: evidence.slice(0, 10).map((i) => i.id), insightIds: insights.slice(0, 5).map((i) => i.id), deliverableIds: ["d1", "d2"], tags: ["cleanser", "skincare"], createdAt: daysAgo(22), updatedAt: daysAgo(1) },
+  { id: "p1", name: "跨行业产品研究工作台", description: "围绕美妆、教育增长、AI 办公、创作者硬件和平台服务建立多元研究样例。", goal: "比较不同行业里的产品定位、增长机制、场景卖点、信任信号和内容转化方向。", keyQuestions: ["每类产品的核心用户任务是什么？", "哪些信息可以转成证据？", "增长、信任和 AI 卖点有什么共同结构？", "如何避免 Demo 示例行业过窄？"], status: "active", sourceIds: ["s1", "s2", "s3", "s4", "s5"], claimIds: claims.slice(0, 8).map((i) => i.id), evidenceIds: evidence.slice(0, 10).map((i) => i.id), insightIds: insights.slice(0, 5).map((i) => i.id), deliverableIds: ["d1", "d2"], tags: ["product-research", "multi-domain"], createdAt: daysAgo(22), updatedAt: daysAgo(1) },
   { id: "p2", name: "AI Product Manager Interview Kit", description: "Reusable interview stories from Lumo research.", goal: "Turn product research into concise PM interview material.", keyQuestions: ["Which product decisions show depth?", "What evidence supports the story?"], status: "active", sourceIds: ["s13", "s14", "s16"], claimIds: claims.slice(8, 13).map((i) => i.id), evidenceIds: evidence.slice(10, 18).map((i) => i.id), insightIds: insights.slice(5, 8).map((i) => i.id), deliverableIds: ["d3"], tags: ["interview", "pm"], createdAt: daysAgo(10), updatedAt: daysAgo(1) },
   { id: "p3", name: "Industrial AI Platform Messaging", description: "Messaging research for industrial AI platform landing pages.", goal: "Clarify the value proposition and evidence for industrial AI buyers.", keyQuestions: ["Which metrics matter?", "What buyer pain is most credible?"], status: "paused", sourceIds: ["s15"], claimIds: claims.slice(13).map((i) => i.id), evidenceIds: evidence.slice(18).map((i) => i.id), insightIds: insights.slice(8).map((i) => i.id), deliverableIds: ["d4"], tags: ["industrial", "messaging"], createdAt: daysAgo(16), updatedAt: daysAgo(4) },
 ];
 
 export const deliverables: Deliverable[] = [
-  { id: "d1", title: "CeraVe 洗面奶竞品货架分析", type: "competitive_analysis", projectId: "p1", content: "# Competitive Analysis\n\n## 1. Research Objective\n分析 CeraVe Hydrating Facial Cleanser 在保湿洁面货架中的定位、卖点和竞品差异。\n\n## 2. Key Finding\n核心定位是温和保湿与屏障维护，主要竞品压力来自泡沫洁面、敏感肌洁面和同价位自有品牌。\n\n## 3. Evidence Sources\n- CeraVe 官方产品页\n- Ulta 用户问答\n- Target 货架页\n- INCI Decoder 成分页", sourceIds: ["s1", "s2", "s3", "s4", "s5"], claimIds: ["cl1", "cl2"], evidenceIds: ["ev1", "ev2"], insightIds: ["in1"], createdAt: daysAgo(2) },
-  { id: "d2", title: "CeraVe 洗面奶产品调研简报", type: "research_brief", projectId: "p1", content: "# Research Brief\n\n## 1. Product Positioning\n温和保湿型洁面，适合 normal to dry skin 和重视屏障维护的人群。\n\n## 2. Core Claims\n- 三种神经酰胺与透明质酸支撑保湿和屏障叙事。\n- 无添加香精、非致痘、清洁后不紧绷是主要购买理由。\n\n## 3. User Questions\n是否能卸妆、是否适合敏感肌、是否会闷痘、泡沫少是否洗得干净。", sourceIds: ["s1", "s2", "s3", "s4", "s5"], claimIds: ["cl3", "cl4"], evidenceIds: ["ev3", "ev4"], insightIds: ["in2"], createdAt: daysAgo(1) },
-  { id: "d3", title: "AI Product Manager Interview Kit", type: "interview_material", projectId: "p2", content: "# Interview Material\n\n## 1. Project Background\nBuilt an AI research workspace from read-it-later behavior.\n\n## 7. STAR Stories\nSituation: saved sources did not become decisions. Task: build a workflow from capture to deliverable.", sourceIds: ["s13", "s14", "s16"], claimIds: ["cl9"], evidenceIds: ["ev12"], insightIds: ["in6"], createdAt: daysAgo(3) },
-  { id: "d4", title: "Research Weekly Report", type: "weekly_report", projectId: "p3", content: "# Research Weekly Report\n\n## 1. New Sources\nIndustrial AI messaging PDF.\n\n## 6. Recommended Actions\nExtract buyer pains, metrics, and proof points before writing positioning.", sourceIds: ["s15"], claimIds: ["cl15"], evidenceIds: ["ev20"], insightIds: ["in9"], createdAt: daysAgo(4) },
+  {
+    id: "d1",
+    title: "跨行业产品研究 · 竞品分析报告",
+    type: "competitive_analysis",
+    projectId: "p1",
+    sourceIds: ["s1", "s2", "s3", "s4", "s5"],
+    claimIds: ["cl1", "cl2"],
+    evidenceIds: ["ev1", "ev2"],
+    insightIds: ["in1"],
+    createdAt: daysAgo(2),
+    content: `# 跨行业产品研究 · 竞品分析报告
+
+**分析日期**：${now.slice(0, 10)} · **覆盖竞品**：5 个 · **维度**：定位 / 用户任务 / 增长机制 / 证据类型
+
+---
+
+## 分析目标
+
+比较不同行业里定位清晰的产品，识别其共性用户任务和可复用的产品设计策略。
+
+---
+
+## 竞品对比矩阵
+
+| 产品 | 行业 | 核心用户任务 | 关键增长机制 | 证据强度 |
+| --- | --- | --- | --- | --- |
+| CeraVe 保湿洁面 | 美妆个护 | 判断成分安全性 | 皮肤科医生背书 | 高 |
+| Duolingo Streak | 教育增长 | 维持学习习惯 | 连续天数 + 社交压力 | 高 |
+| Notion AI | AI 办公 | 降低知识整理摩擦 | 工作流内嵌 AI | 中 |
+| DJI Osmo Pocket 3 | 创作者硬件 | 快速完成拍摄 | 场景化卖点 | 高 |
+| Airbnb Rooms | 平台服务 | 建立陌生人信任 | 房东资料透明化 | 高 |
+
+---
+
+## 1. CeraVe 保湿洁面
+
+![CeraVe 产品实拍](/media/cerave-hydrating-cleanser-real.png)
+
+**定位**：皮肤科医生认可的平价护肤品，主打神经酰胺和透明质酸成分背书。
+
+> "CeraVe 官方产品页把清洁定位为 '温和清洁 + 修护屏障'，而非单纯 '洗净污垢'。"
+> — CeraVe 官方产品页
+
+**Lumo 分析**：成分证据链完整，适合抽取「官方定位 vs 用户认知差距」这条核心观点。
+
+---
+
+## 2. Duolingo 学习留存机制
+
+![Duolingo 学习界面](/media/lumo-case-duolingo.svg)
+
+**定位**：全球最大语言学习 App，连续天数设计是留存核心。
+
+> "Streak 功能让用户每天回来不是为了学习，而是为了不断连续记录。"
+> — Duolingo Blog
+
+**Lumo 分析**：行为习惯设计可直接复用到 Lumo 的复习提醒逻辑。
+
+---
+
+## 差异化机会
+
+- **跟进**：CeraVe 的成分证据链模式 → Lumo 的观点-证据链模式高度相似，可作为用户教育素材
+- **差异化**：现有产品均无法把「跨行业资料」整合成单一研究成果，这是 Lumo 独特的切入点
+- **补充资料**：建议补充用户评价截图和定价页对比截图
+
+---
+
+## 参考来源
+
+- [CeraVe 官方产品页](https://www.cerave.com/skincare/cleansers/hydrating-facial-cleanser)
+- [Duolingo Blog - Streak](https://blog.duolingo.com/streak/)
+- [Notion AI 产品页](https://www.notion.com/product/ai)
+`,
+  },
+  {
+    id: "d2",
+    title: "跨行业产品研究 · 内容脚本",
+    type: "content_script",
+    projectId: "p1",
+    sourceIds: ["s1", "s2", "s3", "s4", "s5"],
+    claimIds: ["cl3", "cl4"],
+    evidenceIds: ["ev3", "ev4"],
+    insightIds: ["in2"],
+    createdAt: daysAgo(1),
+    content: `# 跨行业产品研究 · 内容脚本
+
+**平台**：公众号长文 / B站视频脚本 · **预估时长**：8–12 分钟 · **风格**：观点驱动 + 实例支撑
+
+---
+
+## 脚本摘要
+
+用 5 个不同行业的真实产品案例，说明「用户任务」比「行业类别」更能预测产品成功的核心规律。
+
+---
+
+## 开场钩子（0:00–0:50）
+
+> **口播**："你有没有发现，一个卖洗面奶的品牌，和一个教英语的 App，底层逻辑其实是一样的？"
+
+*[镜头建议：交替出现 CeraVe 产品图和 Duolingo 截图，字幕强调「用户任务」]*
+
+---
+
+## 第一段：问题设置（0:50–2:30）
+
+**口播稿**：
+
+大多数产品分析都在比「这个行业怎么怎么样」，但真正影响用户是否留下来的，是他们来这里要完成的那一件事。
+
+我研究了 5 个看起来完全不同行业的产品，发现了一个反直觉的规律——
+
+---
+
+## 第二段：案例一 CeraVe（2:30–4:30）
+
+![CeraVe 成分分析](/media/cerave-cleanser-texture-real.jpg)
+
+**口播稿**：
+
+先说 CeraVe。很多人以为它卖的是「洗脸功效」，但实际上它卖的是「我不会伤害你的皮肤屏障」。
+
+> "神经酰胺和透明质酸不是噱头，它们支撑的是一个核心叙事：这款产品修护而不破坏。"
+> — CeraVe 官方产品页
+
+*[B-roll：成分表特写，皮肤科医生推荐截图]*
+
+用户任务 = **判断这个产品不会让皮肤变差**，不是「洗干净」。
+
+---
+
+## 第三段：案例二 Duolingo（4:30–6:30）
+
+**口播稿**：
+
+再看 Duolingo。它的核心不是教你学语言，而是让你每天回来。
+
+Streak 设计的本质是：**用连续记录制造损失厌恶**。
+
+> "用户每天回来不是因为想学习，而是因为不想打断连续天数。"
+
+*[字幕：「损失厌恶 > 学习动机」]*
+
+用户任务 = **维持我是「学习者」这个身份认知**，不是「学会西班牙语」。
+
+---
+
+## 第四段：跨行业规律（6:30–9:00）
+
+![研究桌面参考](/media/lumo-real-laptop-research.jpg)
+
+**口播稿**：
+
+把这 5 个产品放在一起看，会发现：
+
+1. 最成功的产品都在服务一个「焦虑点」，不只是一个「功能点」
+2. 最强的证据不是功能说明，而是「用户已经在用这个产品解决这个焦虑」的证明
+3. 跨行业研究的价值，在于找到那些被行业偏见遮住的共性洞察
+
+---
+
+## 结尾行动号召（9:00–结束）
+
+**口播稿**：
+
+如果你也在做产品研究，我把所有参考资料整理好了。评论区告诉我，你想看哪个行业的深度拆解。
+
+*[字幕：关注 + 点赞 + 完整资料链接]*
+
+---
+
+## 参考来源
+
+- [CeraVe 官方产品页](https://www.cerave.com/skincare/cleansers/hydrating-facial-cleanser)
+- [Duolingo Blog](https://blog.duolingo.com/streak/)
+- [Notion AI](https://www.notion.com/product/ai)
+`,
+  },
 ];

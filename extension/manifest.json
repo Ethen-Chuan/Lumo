@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Lumo Web Clipper",
+  "description": "在任意网页用快捷键保存链接、文章片段、视频时间点和当前可视区域截图，自动推送到 Lumo App。",
+  "version": "0.2.0",
+  "permissions": ["activeTab", "tabs", "storage", "downloads", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "action": {
+    "default_title": "收藏到 Lumo",
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "save-link": {
+      "suggested_key": { "default": "Ctrl+Shift+S", "mac": "Command+Shift+S" },
+      "description": "保存当前链接"
+    },
+    "save-article": {
+      "suggested_key": { "default": "Ctrl+Shift+A", "mac": "Command+Shift+A" },
+      "description": "保存文章图文快照"
+    },
+    "save-screenshot": {
+      "suggested_key": { "default": "Ctrl+Shift+X", "mac": "Command+Shift+X" },
+      "description": "保存当前网页截图"
+    },
+    "save-video": {
+      "suggested_key": { "default": "Ctrl+Shift+V", "mac": "Command+Shift+V" },
+      "description": "保存视频时间点"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "http://localhost:517*/*",
+        "http://localhost:518*/*",
+        "http://127.0.0.1:517*/*"
+      ],
+      "js": ["lumo_bridge.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lumo Web Clipper</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <strong>Lumo</strong>
+      <span>网页采集器</span>
+    </header>
+    <p id="lumo-status" class="lumo-disconnected">○ 检测中…</p>
+    <main>
+      <section class="actions">
+        <button data-kind="link">保存链接</button>
+        <button data-kind="article_snapshot">文章快照</button>
+        <button data-kind="image_snapshot">网页截图</button>
+        <button data-kind="video_timestamp">视频时间点</button>
+      </section>
+      <section class="tools">
+        <button id="sync-lumo" disabled>一键同步到 Lumo</button>
+        <button id="open-lumo">打开 Lumo</button>
+        <button id="export">导出 JSON</button>
+        <button id="copy-json">复制 JSON</button>
+        <button id="clear">清空</button>
+      </section>
+      <p id="status"></p>
+      <section id="clips" class="clips"></section>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

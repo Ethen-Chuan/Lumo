@@ -1,5 +1,5 @@
 {
-  "buildCommand": "corepack pnpm build",
+  "buildCommand": "pnpm build",
   "outputDirectory": "dist",
   "framework": "vite",
   "cleanUrls": true,

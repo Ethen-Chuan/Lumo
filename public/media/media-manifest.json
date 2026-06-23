@@ -4,8 +4,28 @@
   "files": [
     {
       "type": "image",
-      "path": "/media/lumo-card-ui-generated.png",
-      "description": "Image-2 生成的高质感资料卡片列表视觉"
+      "path": "/media/lumo-real-reading-desk.jpg",
+      "description": "真实照片：研究桌面与笔记资料封面"
+    },
+    {
+      "type": "image",
+      "path": "/media/lumo-real-laptop-research.jpg",
+      "description": "真实照片：网页研究、文档和资料快照封面"
+    },
+    {
+      "type": "image",
+      "path": "/media/lumo-real-workshop.jpg",
+      "description": "真实照片：产品讨论、访谈材料和工作坊资料封面"
+    },
+    {
+      "type": "image",
+      "path": "/media/cerave-hydrating-cleanser-real.png",
+      "description": "真实商品图：CeraVe Hydrating Facial Cleanser"
+    },
+    {
+      "type": "image",
+      "path": "/media/cerave-cleanser-texture-real.jpg",
+      "description": "真实商品/质地图：CeraVe 洁面质地与使用场景"
     },
     {
       "type": "video",
