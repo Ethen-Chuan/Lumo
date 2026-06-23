@@ -3969,7 +3969,11 @@ function TopicsView() {
                   <span>{collection.sourceIds.length} {english ? "sources" : "条资料"}</span>
                   {unreadCount > 0 && <span className="folder-unread">{unreadCount} {english ? "unread" : "未读"}</span>}
                 </div>
-                <div className="folder-tags">{collection.tags.slice(0, 3).map((tag) => <Badge key={tag}>{tag}</Badge>)}</div>
+                <div className="folder-tags">
+                  {collection.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="folder-tag">{tag}</span>
+                  ))}
+                </div>
               </div>
             </button>
           );
@@ -4022,10 +4026,6 @@ function ReaderView() {
   const [immersive, setImmersive] = useState(false);
   // Reader background color (Morandi / eye-care palette)
   const [readerBg, setReaderBg] = useState<string>("default");
-  // Resizable split: left pane width as percentage (default 62%)
-  const [splitPct, setSplitPct] = useState(62);
-  const splitDragRef = useRef<{ startX: number; startPct: number } | null>(null);
-  const shellRef = useRef<HTMLElement>(null);
   const articleBottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-mark as read when user scrolls to the bottom of the article
@@ -4113,21 +4113,8 @@ function ReaderView() {
 
   return (
     <>
-      <section
-        ref={shellRef}
-        className="reader-shell reader-shell-flex"
-        style={{ background: bgEntry.bg, transition:"background 0.28s", userSelect: splitDragRef.current ? "none" : "auto" }}
-        onPointerMove={e => {
-          if (!splitDragRef.current || !shellRef.current) return;
-          const rect = shellRef.current.getBoundingClientRect();
-          const dx = e.clientX - splitDragRef.current.startX;
-          const newPct = Math.min(80, Math.max(30, splitDragRef.current.startPct + dx / rect.width * 100));
-          setSplitPct(newPct);
-        }}
-        onPointerUp={() => { splitDragRef.current = null; }}
-        onPointerLeave={() => { splitDragRef.current = null; }}
-      >
-        <article className="reader" style={{ flex:`0 0 ${splitPct}%`, minWidth:0, background: "transparent", color: bgEntry.text }}>
+      <section className="reader-shell" style={{ background: bgEntry.bg, transition:"background 0.28s" }}>
+        <article className="reader" style={{ background: "transparent", color: bgEntry.text }}>
           <div className="reader-meta">
             <Badge tone="blue">{source.sourceName}</Badge><Badge>{purposeLabel(source.purpose)}</Badge><Badge tone="green">{source.snapshotStatus === "saved" ? "Snapshot saved" : source.snapshotStatus}</Badge>
           </div>
@@ -4228,23 +4215,7 @@ function ReaderView() {
           {/* Scroll sentinel — triggers auto-read when visible */}
           <div ref={articleBottomRef} className="article-read-sentinel" aria-hidden />
         </article>
-        {/* Drag handle ─ resize left/right split */}
-        <div
-          style={{
-            width:6, flexShrink:0, cursor:"col-resize", zIndex:10,
-            position:"relative", margin:"0 4px",
-          }}
-          onPointerDown={e => {
-            e.preventDefault();
-            (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
-            splitDragRef.current = { startX: e.clientX, startPct: splitPct };
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).querySelector<HTMLDivElement>(".drag-rail")!.style.background = "var(--accent)"; }}
-          onMouseLeave={e => { const r = (e.currentTarget as HTMLDivElement).querySelector<HTMLDivElement>(".drag-rail"); if (r) r.style.background = "var(--border)"; }}
-        >
-          <div className="drag-rail" style={{ position:"absolute", inset:"8% 2px", borderRadius:3, background:"var(--border)", transition:"background 0.15s" }} />
-        </div>
-        <aside className="inspector reader-context-panel" style={{ flex:`0 0 ${100 - splitPct - 1.5}%`, minWidth:200 }}>
+        <aside className="inspector reader-context-panel">
           <div className="ctx-header">
             <span className="ctx-title">{english ? "Context" : "阅读脉络"}</span>
             {contextScore > 0 && <span className="ctx-badge">{contextScore} {english ? "items" : "条"}</span>}
@@ -4380,6 +4351,22 @@ function ImmersiveReader({ source, highlights, notes, onHighlight, onNote, onDel
   const [noteAttachments, setNoteAttachments] = useState<Array<{ type: "image" | "audio" | "video"; dataUrl: string; name: string }>>([]);
   const [fontSize, setFontSize] = useState(17);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  // Morandi / eye-care background palette for immersive reader
+  const IMMERSIVE_BG = [
+    { id:"default",  label:"纯白",    bg:"#ffffff", text:"#0f172a" },
+    { id:"cream",    label:"暖奶白",  bg:"#fef9f0", text:"#2d2018" },
+    { id:"sage",     label:"莫兰迪绿",bg:"#edf2ed", text:"#1a2a1e" },
+    { id:"mist",     label:"雾霾蓝",  bg:"#eef2f6", text:"#1a2030" },
+    { id:"lavender", label:"淡薰衣草",bg:"#f4f0f8", text:"#1e1530" },
+    { id:"sand",     label:"沙漠米",  bg:"#f7f3ec", text:"#2a2010" },
+    { id:"eye",      label:"护眼绿",  bg:"#e8f0e8", text:"#1a2a1e" },
+  ] as const;
+  const [immersiveBg, setImmersiveBg] = useState<string>("default");
+  const bgEntry = IMMERSIVE_BG.find(b => b.id === immersiveBg) ?? IMMERSIVE_BG[0];
+  // Resizable split
+  const [splitPct, setSplitPct] = useState(65);
+  const splitDragRef = useRef<{ startX: number; startPct: number } | null>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const [rightTab, setRightTab] = useState<"notes" | "mindmap" | "chat">("notes");
   const [mmNodes, setMmNodes] = useState<MindMapNode[]>([]);
   const [mmInitedFor, setMmInitedFor] = useState("");
@@ -5953,57 +5940,66 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
       )}
       {tab === "insights" && (() => {
         const updateInsight = useAppStore.getState().updateInsight;
+        // Format snake_case type to readable label
+        const fmtType = (t: string) => t.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        const priorityCfg = {
+          high:   { label:"High",   bg:"#fef2f2", color:"#dc2626", border:"rgba(239,68,68,0.22)" },
+          medium: { label:"Medium", bg:"#fffbeb", color:"#d97706", border:"rgba(245,158,11,0.22)" },
+          low:    { label:"Low",    bg:"#f8fafc", color:"#64748b", border:"rgba(100,116,139,0.2)" },
+        };
+
         const InsightCard = ({ item }: { item: typeof insights[0] }) => {
           const [expanded, setExpanded] = useState(false);
           const [editing, setEditing] = useState(false);
           const [editTitle, setEditTitle] = useState(item.title);
           const [editContent, setEditContent] = useState(item.content);
           const saveEdit = () => { updateInsight(item.id, { title: editTitle.trim() || item.title, content: editContent.trim() || item.content }); setEditing(false); };
+          const pc = priorityCfg[item.priority as keyof typeof priorityCfg] ?? priorityCfg.low;
           return (
-            <article key={item.id} className="claim-card"
-              style={{ borderLeft:"3px solid #818cf8", background:"#f5f3ff" }}>
-              <div className="claim-card-top">
-                <Badge tone={item.priority === "high" ? "purple" : "blue"}>{item.type}</Badge>
-                <Badge tone={item.priority === "high" ? "red" : item.priority === "medium" ? "yellow" : "neutral"}>
-                  {item.priority === "high" ? "High" : item.priority === "medium" ? "Medium" : "Low"}
-                </Badge>
-                <button type="button" onClick={() => { setEditing(e => !e); setEditTitle(item.title); setEditContent(item.content); }}
-                  style={{ marginLeft:"auto", background:"none", border:"none", cursor:"pointer", color:"#6366f1", fontSize:11, fontWeight:600, padding:0, display:"flex", alignItems:"center", gap:3 }}>
-                  <PenLine size={10} /> {editing ? "取消" : "编辑"}
+            <article className="insight-card-v2">
+              {/* Tag row */}
+              <div className="insight-tag-row">
+                <span className="insight-type-tag">{fmtType(item.type)}</span>
+                <span className="insight-priority-tag" style={{ background: pc.bg, color: pc.color, borderColor: pc.border }}>
+                  {pc.label}
+                </span>
+                <button type="button" className="insight-edit-btn"
+                  onClick={() => { setEditing(e => !e); setEditTitle(item.title); setEditContent(item.content); }}>
+                  <PenLine size={9} /> {editing ? "取消" : "编辑"}
                 </button>
               </div>
+
+              {/* Body */}
               {editing ? (
-                <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                  <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
-                    style={{ padding:"6px 10px", borderRadius:8, border:"1.5px solid #a78bfa", fontSize:13, fontWeight:700, background:"#fff", outline:"none" }} />
-                  <textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={4}
-                    style={{ padding:"6px 10px", borderRadius:8, border:"1.5px solid #a78bfa", fontSize:13, background:"#fff", outline:"none", resize:"vertical", lineHeight:1.6 }} />
+                <div className="insight-edit-form">
+                  <input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="insight-edit-input" placeholder="洞察标题" />
+                  <textarea value={editContent} onChange={e => setEditContent(e.target.value)} rows={4} className="insight-edit-textarea" />
                   <div style={{ display:"flex", gap:6 }}>
-                    <button type="button" onClick={saveEdit}
-                      style={{ padding:"5px 14px", borderRadius:8, border:"none", background:"#6366f1", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer" }}>保存</button>
-                    <button type="button" onClick={() => setEditing(false)}
-                      style={{ padding:"5px 12px", borderRadius:8, border:"1px solid #e5e7eb", background:"#fff", color:"#6b7280", fontSize:12, cursor:"pointer" }}>取消</button>
+                    <button type="button" onClick={saveEdit} className="insight-save-btn">保存</button>
+                    <button type="button" onClick={() => setEditing(false)} className="insight-cancel-btn">取消</button>
                   </div>
                 </div>
               ) : (
-                <>
-                  <p className="claim-card-text" style={{ fontWeight:700 }}>{item.title}</p>
-                  <p style={{ fontSize:13, color:"#4f46e5", lineHeight:1.6, margin:0,
-                    display:"-webkit-box", WebkitLineClamp: expanded ? undefined : 3, WebkitBoxOrient:"vertical", overflow: expanded ? "visible" : "hidden" }}>
+                <div className="insight-body">
+                  <p className="insight-title">{item.title}</p>
+                  <p className="insight-content" style={{ WebkitLineClamp: expanded ? undefined : 3, overflow: expanded ? "visible" : "hidden" }}>
                     {item.content}
                   </p>
-                  {item.content.length > 100 && (
-                    <button type="button" onClick={() => setExpanded(!expanded)}
-                      style={{ background:"none", border:"none", color:"#6366f1", fontSize:12, fontWeight:600, cursor:"pointer", padding:0 }}>
-                      {expanded ? "收起" : "展开"}
+                  {item.content.length > 120 && (
+                    <button type="button" className="insight-expand-btn" onClick={() => setExpanded(!expanded)}>
+                      {expanded ? "收起" : "展开全部"}
                     </button>
                   )}
-                </>
+                </div>
               )}
-              <p className="claim-card-meta">{item.claimIds.length} 条观点 · {item.evidenceIds.length} 条证据</p>
-              <div className="claim-card-actions">
-                <button type="button" onClick={() => { appendToDeliverable(projectId, "🔮 洞察", `${item.title}\n${item.content}`); setActiveView("deliverables"); }}>加入成果</button>
-                <AddToGraphBtn projectId={item.projectId} />
+
+              {/* Footer */}
+              <div className="insight-footer">
+                <span className="insight-meta">{item.claimIds.length} 条观点 · {item.evidenceIds.length} 条证据</span>
+                <div className="insight-actions">
+                  <button type="button" onClick={() => { appendToDeliverable(projectId, "🔮 洞察", `${item.title}\n${item.content}`); setActiveView("deliverables"); }}>加入成果</button>
+                  <AddToGraphBtn projectId={item.projectId} />
+                </div>
               </div>
             </article>
           );
