@@ -13,6 +13,12 @@ import {
   Download,
   ExternalLink,
   FileOutput,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  Minimize2,
+  RotateCcw,
+  Locate,
   Folder,
   Globe2,
   Highlighter,
@@ -32,6 +38,7 @@ import {
   Palette,
   Plug,
   Plus,
+  LayoutGrid,
   Search,
   Send,
   Settings,
@@ -52,7 +59,6 @@ import {
   X,
   Mic,
   GitBranch,
-  ZoomOut,
   ChevronDown,
   User,
   Briefcase,
@@ -1012,6 +1018,9 @@ const ONBOARDING_STEPS = [
     bodyEn: "Save articles, videos, screenshots and links to your Lumo library. Click Add or install the Chrome extension.",
     action: "去添加资料",
     actionEn: "Add a source",
+    heroFrom: "#e0f2fe", heroTo: "#ede9fe",
+    accentFrom: "#38bdf8", accentTo: "#818cf8",
+    glow: "rgba(56,189,248,0.25)",
   },
   {
     emoji: "✏️",
@@ -1021,6 +1030,9 @@ const ONBOARDING_STEPS = [
     bodyEn: "Open any source in the Reader, highlight key passages and add notes. Lumo turns them into reusable claims and evidence.",
     action: "去阅读器",
     actionEn: "Open reader",
+    heroFrom: "#fef9c3", heroTo: "#fed7aa",
+    accentFrom: "#fbbf24", accentTo: "#f97316",
+    glow: "rgba(251,191,36,0.25)",
   },
   {
     emoji: "🔮",
@@ -1030,6 +1042,9 @@ const ONBOARDING_STEPS = [
     bodyEn: "Add sources to a project, generate insights, then one-click assemble a research brief, competitive analysis or PRD.",
     action: "开始使用 Lumo",
     actionEn: "Start using Lumo",
+    heroFrom: "#ede9fe", heroTo: "#fae8ff",
+    accentFrom: "#8b5cf6", accentTo: "#d946ef",
+    glow: "rgba(139,92,246,0.28)",
   },
 ];
 
@@ -1042,21 +1057,37 @@ function OnboardingModal({ step, onNext, onSkip, onGoCapture, onGoReader, englis
     <div className="onboarding-overlay">
       <div className="onboarding-card">
         <button type="button" className="onboarding-skip" onClick={onSkip}>{english ? "Skip" : "跳过"}</button>
-        <div className="onboarding-step-dots">
-          {ONBOARDING_STEPS.map((_, i) => <span key={i} className={i === step ? "active" : ""} />)}
+
+        {/* Hero: per-step gradient + floating icon */}
+        <div className="onboarding-hero" style={{ background: `linear-gradient(135deg, ${s.heroFrom} 0%, ${s.heroTo} 100%)` }}>
+          <div className="onboarding-hero-glow" style={{ background: s.glow }} />
+          <img src="/media/lumo-app-icon-new.svg" alt="Lumo" className="onboarding-hero-img"
+            style={{ filter: `drop-shadow(0 12px 28px ${s.glow})` }} />
+          <span className="onboarding-step-emoji">{s.emoji}</span>
         </div>
-        <div className="onboarding-emoji">{s.emoji}</div>
-        <h2 className="onboarding-title">{english ? s.titleEn : s.title}</h2>
-        <p className="onboarding-body">{english ? s.bodyEn : s.body}</p>
-        <button
-          type="button"
-          className="onboarding-cta"
+
+        {/* Dots */}
+        <div className="onboarding-step-dots">
+          {ONBOARDING_STEPS.map((_, i) => (
+            <span key={i} className={i === step ? "active" : ""}
+              style={i === step ? { background: s.accentFrom } : {}} />
+          ))}
+        </div>
+
+        {/* Text */}
+        <div className="onboarding-text" key={step}>
+          <h2 className="onboarding-title">{english ? s.titleEn : s.title}</h2>
+          <p className="onboarding-body">{english ? s.bodyEn : s.body}</p>
+        </div>
+
+        {/* CTA */}
+        <button type="button" className="onboarding-cta"
+          style={{ background: `linear-gradient(135deg, ${s.accentFrom}, ${s.accentTo})`, boxShadow: `0 6px 20px ${s.glow}, inset 0 1px 0 rgba(255,255,255,0.25)` }}
           onClick={() => {
             if (step === 0) onGoCapture();
             else if (step === 1) onGoReader();
             else onNext();
-          }}
-        >
+          }}>
           {english ? s.actionEn : s.action}
         </button>
         {step < 2 && (
@@ -2201,6 +2232,7 @@ function pageTitle(view: ActiveView, language: AppLanguage = "zh") {
     profile: "个人中心",
     community: "Lumo之家",
     settings: "设置",
+    worldtree: "世界树",
   };
   const labelsEn: Record<ActiveView, string> = {
     inbox: "AI Inbox",
@@ -2220,6 +2252,7 @@ function pageTitle(view: ActiveView, language: AppLanguage = "zh") {
     profile: "Profile",
     community: "Lumo Home",
     settings: "Settings",
+    worldtree: "World Tree",
   };
   return language === "en" ? labelsEn[view] : labels[view];
 }
@@ -2243,6 +2276,7 @@ function pageDescription(view: ActiveView, language: AppLanguage = "zh") {
     profile: "管理账号、头像、个人资料和套餐信息。",
     community: "Lumo 之家：公开笔记、知识内容和用户互动。",
     settings: "语言、主题和插件配置；账号与导入导出入口也在这里。",
+    worldtree: "以项目为中心的动态关系图谱，发现跨项目经验与关联。",
   };
   const descriptionsEn: Record<ActiveView, string> = {
     sources: "Your source library: collect links, articles, screenshots, videos, PDFs, and rough ideas.",
@@ -2262,6 +2296,7 @@ function pageDescription(view: ActiveView, language: AppLanguage = "zh") {
     profile: "Manage sign-in, avatar, profile and plan information.",
     community: "Lumo Home for public notes, knowledge sharing, and visitor interactions.",
     settings: "Language, theme, and extension config; account and import/export links are here too.",
+    worldtree: "Dynamic project relationship graph — discover cross-project experience and connections.",
   };
   return language === "en" ? descriptionsEn[view] : descriptions[view];
 }
@@ -2296,6 +2331,7 @@ function ViewRouter({ onCapture }: { onCapture: (mode?: QuickCaptureMode) => voi
   if (activeView === "sources") return <ViewErrorBoundary><AllSources onCapture={onCapture} /></ViewErrorBoundary>;
   if (activeView === "collections") return <ViewErrorBoundary><TopicsView /></ViewErrorBoundary>;
   if (activeView === "projects") return <ViewErrorBoundary><ProjectsView /></ViewErrorBoundary>;
+  if (activeView === "worldtree") return <ViewErrorBoundary><WorldTreePage /></ViewErrorBoundary>;
   if (activeView === "reader") return <ViewErrorBoundary><ReaderView /></ViewErrorBoundary>;
   if (activeView === "highlights") return <ViewErrorBoundary><HighlightsView /></ViewErrorBoundary>;
   if (activeView === "notes") return <ViewErrorBoundary><NotesView /></ViewErrorBoundary>;
@@ -2606,6 +2642,93 @@ type AssistantMessage = {
   navActions?: Array<{ label: string; view: ActiveView }>;
 };
 
+/** Render assistant markdown: headers, bold, bullets, numbered lists, horizontal rules */
+function renderAssistantMarkdown(text: string): React.ReactNode {
+  const lines = text
+    .replace(/\r\n/g, "\n")
+    .split("\n");
+
+  const result: React.ReactNode[] = [];
+  let listItems: string[] = [];
+  let listType: "ul" | "ol" | null = null;
+  let key = 0;
+
+  const flushList = () => {
+    if (listItems.length === 0) return;
+    const Tag = listType === "ol" ? "ol" : "ul";
+    result.push(
+      <Tag key={key++} style={{ margin:"6px 0 8px 16px", paddingLeft:8, display:"grid", gap:3 }}>
+        {listItems.map((item, i) => (
+          <li key={i} style={{ fontSize:13, lineHeight:1.65, color:"inherit" }}
+            dangerouslySetInnerHTML={{ __html: inlineMarkdown(item) }}/>
+        ))}
+      </Tag>
+    );
+    listItems = [];
+    listType = null;
+  };
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+
+    // Horizontal rule
+    if (/^---+$/.test(line.trim())) {
+      flushList();
+      result.push(<hr key={key++} style={{ border:"none", borderTop:"1px solid var(--border)", margin:"10px 0" }}/>);
+      continue;
+    }
+    // H1–H3
+    const hMatch = line.match(/^(#{1,3})\s+(.+)$/);
+    if (hMatch) {
+      flushList();
+      const level = hMatch[1].length;
+      const fs = level === 1 ? 15 : level === 2 ? 14 : 13;
+      const mt = level === 1 ? 14 : 10;
+      result.push(
+        <div key={key++} style={{ fontWeight:800, fontSize:fs, color:"var(--text-primary)", marginTop:mt, marginBottom:4, lineHeight:1.4 }}
+          dangerouslySetInnerHTML={{ __html: inlineMarkdown(hMatch[2]) }}/>
+      );
+      continue;
+    }
+    // Numbered list
+    const numMatch = line.match(/^(\d+)[.、]\s+(.+)$/);
+    if (numMatch) {
+      if (listType !== "ol") { flushList(); listType = "ol"; }
+      listItems.push(numMatch[2]);
+      continue;
+    }
+    // Bullet list
+    const bulletMatch = line.match(/^[-•*·]\s+(.+)$/);
+    if (bulletMatch) {
+      if (listType !== "ul") { flushList(); listType = "ul"; }
+      listItems.push(bulletMatch[1]);
+      continue;
+    }
+    // Empty line
+    if (!line.trim()) {
+      flushList();
+      result.push(<div key={key++} style={{ height:6 }}/>);
+      continue;
+    }
+    // Normal paragraph
+    flushList();
+    result.push(
+      <p key={key++} style={{ margin:"2px 0", fontSize:13, lineHeight:1.7, color:"inherit" }}
+        dangerouslySetInnerHTML={{ __html: inlineMarkdown(line) }}/>
+    );
+  }
+  flushList();
+  return <>{result}</>;
+}
+
+/** Convert inline markdown: **bold**, *italic*, `code` */
+function inlineMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:760">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code style="font-family:ui-monospace,monospace;font-size:11.5px;background:rgba(99,102,241,0.1);color:#4f46e5;border-radius:3px;padding:1px 4px">$1</code>');
+}
+
 function FloatingAssistant({ onClose, onCapture }: { onClose: () => void; onCapture: (mode?: QuickCaptureMode) => void }) {
   const activeView = useAppStore((s) => s.activeView);
   const setActiveView = useAppStore((s) => s.setActiveView);
@@ -2729,7 +2852,13 @@ function FloatingAssistant({ onClose, onCapture }: { onClose: () => void; onCapt
         {quickActions.map((item) => <button key={item.label} onClick={item.action}>{item.label}</button>)}
       </div>
       <div className="assistant-messages">
-        {messages.map((message, index) => <div className={`assistant-message ${message.role}`} key={`${message.role}-${index}`}>{message.content}</div>)}
+        {messages.map((message, index) => (
+          <div className={`assistant-message ${message.role}`} key={`${message.role}-${index}`}>
+            {message.role === "assistant"
+              ? renderAssistantMarkdown(message.content)
+              : message.content}
+          </div>
+        ))}
         {isThinking && <div className="assistant-message assistant thinking"><span className="assistant-dots"><span /><span /><span /></span>Lumo 正在思考…</div>}
       </div>
       <form className="assistant-input" onSubmit={(event) => { event.preventDefault(); ask(input); }}>
@@ -3524,7 +3653,6 @@ function SourceCard({ sourceId, compact = false, selected = false, gallery = fal
             onClick={toggleReadStatus}
             title={readActive ? (english ? "Mark unread" : "取消已读") : (english ? "Mark read" : "标为已读")}
           ><CheckCircle2 size={16} /></Button>
-          <Button variant="ghost" onClick={() => setToolsOpen(true)} title={english ? "More actions" : "更多操作"}><MoreHorizontal size={16} /></Button>
         </div>
         {toolsOpen && <SourceToolsModal source={source} onClose={() => setToolsOpen(false)} />}
       </article>
@@ -3924,6 +4052,8 @@ function TopicsView() {
   const selectedCollectionId = useAppStore((s) => s.selectedCollectionId) ?? collections[0]?.id;
   const setSelectedCollection = useAppStore((s) => s.setSelectedCollection);
   const addSourceToProject = useAppStore((s) => s.addSourceToProject);
+  const setActiveView = useAppStore((s) => s.setActiveView);
+  const setSelectedProject = useAppStore((s) => s.setSelectedProject);
   const projects = useAppStore((s) => s.projects);
   const sources = useAppStore((s) => s.sources);
   const notify = useAppStore((s) => s.notify);
@@ -3942,6 +4072,14 @@ function TopicsView() {
           <h2>{english ? "Collections" : "主题夹"}</h2>
           <p>{english ? "Organise sources into topic folders." : "按主题把资料归入文件夹，点击查看其中的资料。"}</p>
         </div>
+        {/* World Tree return button */}
+        <button className="wt-nav-return-btn"
+          onClick={() => {
+            setActiveView("worldtree");
+          }}>
+          <WTReturnIcon />
+          <span>{english ? "World Tree" : "世界树"}</span>
+        </button>
       </div>
 
       {addModalOpen && <AddSourceModal onClose={() => setAddModalOpen(false)} />}
@@ -4014,6 +4152,8 @@ function ReaderView() {
   const deleteNote = useAppStore((s) => s.deleteNote);
   const createClaimFromParagraph = useAppStore((s) => s.createClaimFromParagraph);
   const createEvidenceFromParagraph = useAppStore((s) => s.createEvidenceFromParagraph);
+  const createInsightFromAnnotation = useAppStore((s) => s.createInsightFromAnnotation);
+  const selectedProjectId = useAppStore((s) => s.selectedProjectId);
   const markSourceAsRead = useAppStore((s) => s.markSourceAsRead);
   const archiveSource = useAppStore((s) => s.archiveSource);
   const updateSource = useAppStore((s) => s.updateSource);
@@ -4280,6 +4420,10 @@ function ReaderView() {
           onHighlight={(idx, color, start, end) => createHighlight(source.id, idx, color, start, end)}
           onNote={(idx, text, attachments) => createNote(source.id, idx, text, attachments)}
           onDeleteNote={(id) => deleteNote(id)}
+          onSaveAsInsight={(text) => {
+            const projId = selectedProjectId ?? useAppStore.getState().projects[0]?.id;
+            if (projId) createInsightFromAnnotation(text, source.title, projId);
+          }}
           onClose={() => setImmersive(false)}
         />
       )}
@@ -4333,13 +4477,14 @@ interface MindMapNode {
   shape?: "rounded" | "pill" | "sharp";
 }
 
-function ImmersiveReader({ source, highlights, notes, onHighlight, onNote, onDeleteNote, onClose }: {
+function ImmersiveReader({ source, highlights, notes, onHighlight, onNote, onDeleteNote, onSaveAsInsight, onClose }: {
   source: Source;
   highlights: ImmersiveHighlight[];
   notes: { id: string; paragraphIndex?: number; content: string; createdAt?: string; attachments?: Array<{ type: "image"|"audio"|"video"; dataUrl: string; name: string }> }[];
   onHighlight: (idx: number, color: HighlightColor, startOffset?: number, endOffset?: number) => void;
   onNote: (idx: number, text: string, attachments?: Array<{ type: "image"|"audio"|"video"; dataUrl: string; name: string }>) => void;
   onDeleteNote: (id: string) => void;
+  onSaveAsInsight: (text: string) => void;
   onClose: () => void;
 }) {
   const [activeTool, setActiveTool] = useState<"highlight" | "note" | null>(null);
@@ -4634,7 +4779,18 @@ function ImmersiveReader({ source, highlights, notes, onHighlight, onNote, onDel
                   <input ref={videoInputRef} type="file" accept="video/*" className="visually-hidden" onChange={(e) => e.target.files?.[0] && handleMediaFile(e.target.files[0], "video")} />
                   <span style={{ flex: 1 }} />
                   <button type="button" onClick={() => { setNoteIdx(null); setNoteAttachments([]); }}>取消</button>
-                  <button type="button" className="primary" onClick={saveNote}>保存</button>
+                  <button type="button" className="primary" onClick={saveNote}>保存批注</button>
+                  <button type="button"
+                    style={{ padding:"6px 10px", borderRadius:8, border:"1.5px solid #7c3aed", background:"rgba(124,58,237,0.08)", color:"#7c3aed", fontSize:12, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", gap:5 }}
+                    title="保存批注 + 同步到当前项目的洞察"
+                    onClick={() => {
+                      if (noteText.trim()) {
+                        saveNote();
+                        onSaveAsInsight(noteText.trim());
+                      }
+                    }}>
+                    ✨ 同步为洞察
+                  </button>
                 </div>
               </div>
             )}
@@ -5768,6 +5924,1463 @@ function EmptyProjectState({ language }: { language: AppLanguage }) {
 // ── Agent Panel ───────────────────────────────────────────
 // Extracted to src/components/AgentPanel.tsx
 
+// ── World Tree View ──────────────────────────────────────────────────────────
+// ── World Tree — Production Grade Knowledge Canvas ────────────────────────
+function WTTreeIcon({ size = 38 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 42" fill="none" style={{ filter: "drop-shadow(0 0 4px rgba(255,255,255,0.28))" }}>
+      <defs>
+        <radialGradient id="wti-tip" cx="40%" cy="30%" r="65%">
+          <stop offset="0%" stopColor="rgba(255,255,255,1)" />
+          <stop offset="100%" stopColor="rgba(210,220,255,0.8)" />
+        </radialGradient>
+        <linearGradient id="wti-trunk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.75)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0.3)" />
+        </linearGradient>
+      </defs>
+      {/* Trunk */}
+      <path d="M20 40 C20 40 20 32 20 25" stroke="url(#wti-trunk)" strokeWidth="3.2" strokeLinecap="round" />
+      {/* Thick left branch */}
+      <path d="M20 25 C18 22 13 19 9 15" stroke="rgba(255,255,255,0.72)" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+      {/* Thick right branch */}
+      <path d="M20 25 C22 22 27 19 31 15" stroke="rgba(255,255,255,0.72)" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+      {/* Center shoot */}
+      <path d="M20 25 C20 21 20 17 20 13" stroke="rgba(255,255,255,0.72)" strokeWidth="1.9" strokeLinecap="round" />
+      {/* Left sub-branches */}
+      <path d="M9 15 C7 12 5 9 4 7" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      <path d="M9 15 C11 12 13 10 14 8" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      {/* Right sub-branches */}
+      <path d="M31 15 C33 12 35 9 36 7" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      <path d="M31 15 C29 12 27 10 26 8" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      {/* Center sub-branches */}
+      <path d="M20 13 C18 10 17 8 16 6" stroke="rgba(255,255,255,0.46)" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+      <path d="M20 13 C22 10 23 8 24 6" stroke="rgba(255,255,255,0.46)" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+      {/* Tip glow halos */}
+      <circle cx="4" cy="6.5" r="4.2" fill="rgba(255,255,255,0.1)" />
+      <circle cx="36" cy="6.5" r="4.2" fill="rgba(255,255,255,0.1)" />
+      <circle cx="20" cy="5" r="3.5" fill="rgba(255,255,255,0.08)" />
+      {/* Gem nodes — large tips */}
+      <circle cx="4" cy="6.5" r="3" fill="url(#wti-tip)" />
+      <circle cx="4" cy="5.8" r="1.2" fill="rgba(255,255,255,0.55)" />
+      <circle cx="36" cy="6.5" r="3" fill="url(#wti-tip)" />
+      <circle cx="36" cy="5.8" r="1.2" fill="rgba(255,255,255,0.55)" />
+      {/* Medium nodes */}
+      <circle cx="14" cy="7.5" r="2.5" fill="url(#wti-tip)" />
+      <circle cx="26" cy="7.5" r="2.5" fill="url(#wti-tip)" />
+      {/* Small center nodes */}
+      <circle cx="16" cy="5.5" r="2.2" fill="url(#wti-tip)" />
+      <circle cx="24" cy="5.5" r="2.2" fill="url(#wti-tip)" />
+    </svg>
+  );
+}
+
+/** Ghost icon — matches user's provided emoji-style ghost */
+function GhostIcon({ size = 15, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size * 1.1} viewBox="0 0 20 22" fill="none" className={className}>
+      {/* Body */}
+      <path
+        d="M10 1C6.134 1 3 4.358 3 8.5V19.5L5.75 17L8.5 19.5L10 18L11.5 19.5L14.25 17L17 19.5V8.5C17 4.358 13.866 1 10 1Z"
+        fill="currentColor"
+      />
+      {/* Open eye (left) */}
+      <circle cx="7.8" cy="10.5" r="1.6" fill="var(--surface-strong,#fff)" opacity="0.9" />
+      <circle cx="7.8" cy="10.5" r="0.7" fill="rgba(99,102,241,0.9)" />
+      {/* Winking eye (right) — curved line */}
+      <path
+        d="M12.2 10 Q13.2 8.8 14.2 10"
+        stroke="var(--surface-strong,#fff)"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.9"
+      />
+    </svg>
+  );
+}
+
+/** Small tree icon for the "return to World Tree" button in project workspace */
+function WTReturnIcon() {
+  return (
+    <svg width="13" height="14" viewBox="0 0 13 14" fill="none" style={{ flexShrink:0 }}>
+      <path d="M6.5 13 L6.5 8.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+      <path d="M6.5 8.5 C5.5 7 3.5 6 2 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+      <path d="M6.5 8.5 C7.5 7 9.5 6 11 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+      <path d="M6.5 8.5 L6.5 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+      <circle cx="2" cy="4" r="1.5" fill="currentColor"/>
+      <circle cx="11" cy="4" r="1.5" fill="currentColor"/>
+      <circle cx="5" cy="2.5" r="1.3" fill="currentColor"/>
+      <circle cx="8" cy="2.5" r="1.3" fill="currentColor"/>
+    </svg>
+  );
+}
+
+const WT_STORAGE_KEY = "lumo-wt-layout-v2";
+
+// One-shot pending tab: set this before calling setActiveView("projects")
+// ProjectWorkspace reads it once on mount, then clears it.
+let _pendingProjectTab: string | null = null;
+const REL_TYPES = [
+  { id:"support", label:"支持", color:"#22c55e" },
+  { id:"oppose",  label:"反对", color:"#ef4444" },
+  { id:"cause",   label:"因果", color:"#f59e0b" },
+  { id:"compare", label:"对比", color:"#3b82f6" },
+  { id:"related", label:"相关", color:"#8b5cf6" },
+];
+
+/** Standalone full-page World Tree — navigated to via setActiveView("worldtree") */
+function WorldTreePage() {
+  const setActiveView = useAppStore(s => s.setActiveView);
+  const language = useAppStore(s => s.language);
+  const english = isEn(language);
+  return (
+    <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"var(--app-bg)" }}>
+      {/* Slim top bar with back button */}
+      <div style={{
+        display:"flex", alignItems:"center", gap:10, padding:"8px 16px",
+        borderBottom:"1px solid var(--border)",
+        background:"color-mix(in srgb, var(--surface-strong) 95%, transparent)",
+        backdropFilter:"blur(12px)", flexShrink:0,
+      }}>
+        <button
+          onClick={() => setActiveView("collections")}
+          style={{
+            display:"inline-flex", alignItems:"center", gap:6,
+            padding:"5px 12px", borderRadius:9,
+            border:"1.5px solid var(--border)",
+            background:"var(--surface-strong)", color:"var(--text-secondary)",
+            fontSize:12.5, fontWeight:700, cursor:"pointer",
+            transition:"all 0.15s",
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor="var(--accent)"; (e.currentTarget as HTMLElement).style.color="var(--accent)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor="var(--border)"; (e.currentTarget as HTMLElement).style.color="var(--text-secondary)"; }}
+        >
+          ← {english ? "Back" : "返回"}
+        </button>
+        <span style={{ width:1, height:16, background:"var(--border)" }}/>
+        <span style={{ fontSize:13, fontWeight:800, color:"var(--text-primary)", letterSpacing:"-0.01em" }}>
+          🌳 {english ? "World Tree" : "世界树"}
+        </span>
+        <span style={{ fontSize:11, color:"var(--text-muted)", fontWeight:500 }}>
+          {english ? "Dynamic project relationship graph" : "动态项目关系图谱"}
+        </span>
+      </div>
+      {/* Full-height tree canvas */}
+      <div style={{ flex:1, overflow:"hidden" }}>
+        <WorldTreeView language={language} />
+      </div>
+    </div>
+  );
+}
+
+function WorldTreeView({ language }: { language: AppLanguage }) {
+  const allProjects     = useAppStore(s => s.projects).filter(p => p.status !== "archived");
+  const allCollections  = useAppStore(s => s.collections);
+  const allClaims       = useAppStore(s => s.claims);
+  const allInsights     = useAppStore(s => s.insights);
+  const allEvidence     = useAppStore(s => s.evidence);
+  const allSources      = useAppStore(s => s.sources);
+  const setActiveView   = useAppStore(s => s.setActiveView);
+  const setSelectedProject = useAppStore(s => s.setSelectedProject);
+  const setSelectedSource  = useAppStore(s => s.setSelectedSource);
+  const english = isEn(language);
+
+  const WW = 6000, WH = 5000, WCX = WW / 2, WCY = WH / 2;
+  // Larger radii → nodes spread further apart → more impressive full-canvas look
+  const R_COLL = 220, R_PROJ = 420, R_LEAF = 640;
+
+  // ── Persistent layout ─────────────────────────────────────────────────
+  const loadLayout = () => { try { return JSON.parse(localStorage.getItem(WT_STORAGE_KEY) ?? "{}"); } catch { return {}; } };
+  const [posOvr, setPosOvrRaw]  = useState<Record<string, { x:number; y:number }>>(loadLayout().pos ?? {});
+  const [userEdges, setUserEdgesRaw] = useState<Array<{ id:string; from:string; to:string; rel:string }>>(loadLayout().edges ?? []);
+  const setPosOvr   = (v: Record<string, { x:number; y:number }> | ((prev: Record<string, { x:number; y:number }>) => Record<string, { x:number; y:number }>)) => {
+    setPosOvrRaw(prev => { const next = typeof v === "function" ? v(prev) : v; localStorage.setItem(WT_STORAGE_KEY, JSON.stringify({ pos: next, edges: userEdges })); return next; });
+  };
+  type WTEdge = { id:string; from:string; to:string; rel:string };
+  const setUserEdges = (v: WTEdge[] | ((p: WTEdge[]) => WTEdge[])) => {
+    setUserEdgesRaw(prev => { const next = typeof v === "function" ? v(prev) : v; localStorage.setItem(WT_STORAGE_KEY, JSON.stringify({ pos: posOvr, edges: next })); return next; });
+  };
+
+  // ── Canvas ─────────────────────────────────────────────────────────────
+  const [zoom, setZoom]   = useState(0.72);
+  const [pan, setPan]     = useState({ x: 0, y: 0 });
+  const [isFS, setIsFS]   = useState(false);
+  const containerRef      = useRef<HTMLDivElement>(null);
+  const panRef            = useRef<{ sx:number; sy:number; px:number; py:number } | null>(null);
+  const isPanRef          = useRef(false);
+  const isDraggingRef     = useRef(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const { clientWidth:cw, clientHeight:ch } = containerRef.current;
+    setPan({ x: cw/2 - WCX*zoom, y: ch/2 - WCY*zoom });
+  }, [isFS]);
+
+  const zoomAround = (factor: number, cx?: number, cy?: number) => {
+    if (!containerRef.current) return;
+    const r = containerRef.current.getBoundingClientRect();
+    const px = cx ?? r.width/2, py = cy ?? r.height/2;
+    setZoom(prev => {
+      const nz = Math.min(Math.max(prev * factor, 0.15), 4);
+      const wx = (px - pan.x) / prev, wy = (py - pan.y) / prev;
+      setPan({ x: px - wx*nz, y: py - wy*nz });
+      return nz;
+    });
+  };
+  const onWheel = (e: React.WheelEvent) => { e.preventDefault(); const r = containerRef.current!.getBoundingClientRect(); zoomAround(e.deltaY < 0 ? 1.1 : 0.91, e.clientX - r.left, e.clientY - r.top); };
+
+  // ── Node drag ─────────────────────────────────────────────────────────
+  const nodeDragRef = useRef<{ id:string; ox:number; oy:number; sx:number; sy:number; moved:boolean } | null>(null);
+
+  // ── UI state ───────────────────────────────────────────────────────────
+  // Default: all projects expanded so the tree looks full and impressive
+  const [expanded, setExpanded]   = useState<Set<string>>(() => new Set(allProjects.map(p => p.id)));
+  const [focusId, setFocusId]     = useState<string | null>(null);
+  const [focalId, setFocalId]     = useState<string | null>(null); // Analysis base point
+  const [hoverId, setHoverId]     = useState<string | null>(null);
+  const [linkMode, setLinkMode]   = useState(false);
+  const [linkSrc, setLinkSrc]     = useState<string | null>(null);
+  const [pendingEdge, setPendingEdge] = useState<{ from:string; to:string } | null>(null);
+  const [searchQ, setSearchQ]     = useState("");
+  const [showLegend, setShowLegend] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
+  const [aiRelNote, setAiRelNote] = useState<string | null>(null);
+  const [aiStreamText, setAiStreamText] = useState<string>("");
+  const [aiAnalysisMode, setAiAnalysisMode] = useState<"quick" | "deep">("quick");
+  // Panel drag: null = CSS default (top-right), {left,top} = after first drag (absolute px)
+  const [panelPos, setPanelPos] = useState<{left:number;top:number}|null>(null);
+  const panelDragRef = useRef<{ sx:number; sy:number; ox:number; oy:number } | null>(null);
+  // Group-organize mode: when set, leaf nodes of that project cluster by type
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const [groupMode, setGroupMode] = useState(false);
+  // Project info popup: single-click shows brief project card
+  const [projInfoId, setProjInfoId] = useState<string | null>(null);
+  // Leaf info popup: single-click shows full content of a claim/insight/evidence node
+  const [leafInfoId, setLeafInfoId] = useState<string | null>(null);
+  // Double-click detection (more reliable than e.detail)
+  const lastNodeClickRef = useRef<{id:string;time:number}|null>(null);
+
+  // ── 3-Dimensional Project Relation Matrix ─────────────────────────────
+  // similarity → node SIZE | business → node DISTANCE | evidence → edge THICKNESS
+  type RelDims = { similarity: number; business: number; evidence: number };
+
+  const relationMap = useMemo<Record<string, Record<string, RelDims>>>(() => {
+    const map: Record<string, Record<string, RelDims>> = {};
+    allProjects.forEach(pa => {
+      map[pa.id] = {};
+      allProjects.forEach(pb => {
+        if (pa.id === pb.id) { map[pa.id][pb.id] = { similarity:100, business:100, evidence:100 }; return; }
+
+        const clsA = allClaims.filter(c => c.projectId === pa.id);
+        const clsB = allClaims.filter(c => c.projectId === pb.id);
+        const evA  = allEvidence.filter(e => e.projectId === pa.id);
+        const evB  = allEvidence.filter(e => e.projectId === pb.id);
+        const insA = allInsights.filter(i => i.projectId === pa.id);
+        const insB = allInsights.filter(i => i.projectId === pb.id);
+        const srcA = allSources.filter(s => pa.sourceIds.includes(s.id));
+        const srcB = allSources.filter(s => pb.sourceIds.includes(s.id));
+        const sharedSrc = pa.sourceIds.filter(id => pb.sourceIds.includes(id)).length;
+        // Jaccard similarity for sources: intersection / union → caps naturally at 1.0
+        const unionSrc = new Set([...pa.sourceIds, ...pb.sourceIds]).size;
+        const jaccardSrc = unionSrc > 0 ? sharedSrc / unionSrc : 0;
+
+        // Dim 1 — Content Similarity (node SIZE)
+        // Jaccard source overlap (max 65%) + softened keyword/tag/insight contributions
+        const wA = new Set(clsA.flatMap(c => c.text.split(/[\s，。、！？,.!?]+/).filter(w => w.length > 2)));
+        const wB = new Set(clsB.flatMap(c => c.text.split(/[\s，。、！？,.!?]+/).filter(w => w.length > 2)));
+        const kwOv = Math.min([...wA].filter(w => wB.has(w)).length, 10);
+        const tagsA = new Set(srcA.flatMap(s => s.tags ?? []));
+        const tagsB = new Set(srcB.flatMap(s => s.tags ?? []));
+        const tagUnion = new Set([...tagsA, ...tagsB]).size;
+        const tagJacc = tagUnion > 0 ? [...tagsA].filter(t => tagsB.has(t)).length / tagUnion : 0;
+        const iwA = new Set(insA.flatMap(i => i.title.split(/\s+/).filter(w => w.length > 2)));
+        const iwB = new Set(insB.flatMap(i => i.title.split(/\s+/).filter(w => w.length > 2)));
+        const insOv = Math.min([...iwA].filter(w => iwB.has(w)).length, 5);
+        const similarity = Math.min(95, Math.round(
+          jaccardSrc * 65        // up to 65 from source overlap (Jaccard)
+          + tagJacc * 15         // up to 15 from tag overlap (Jaccard)
+          + kwOv * 0.6           // up to 6 from keyword overlap
+          + insOv * 1.2          // up to 6 from insight overlap
+        ));
+
+        // Dim 2 — Business Directness (DISTANCE)
+        const domA = new Set(srcA.map(s => s.type));
+        const domB = new Set(srcB.map(s => s.type));
+        const domUnion = new Set([...domA, ...domB]).size;
+        const domJacc = domUnion > 0 ? [...domA].filter(t => domB.has(t)).length / domUnion : 0;
+        const hcA = new Set(clsA.filter(c => c.confidence === "high").flatMap(c => c.text.split(/[\s，。]+/).filter(w => w.length > 3)));
+        const hcB = new Set(clsB.filter(c => c.confidence === "high").flatMap(c => c.text.split(/[\s，。]+/).filter(w => w.length > 3)));
+        const hcOv = Math.min([...hcA].filter(w => hcB.has(w)).length, 8);
+        const itA = new Set(insA.map(i => i.type));
+        const itB = new Set(insB.map(i => i.type));
+        const itJacc = new Set([...itA,...itB]).size > 0 ? [...itA].filter(t=>itB.has(t)).length/new Set([...itA,...itB]).size : 0;
+        const business = Math.min(95, Math.round(
+          jaccardSrc * 60        // source overlap (Jaccard)
+          + domJacc * 15         // same source domain types
+          + hcOv * 1.2           // high-confidence claim overlap
+          + itJacc * 8           // insight type overlap
+        ));
+
+        // Dim 3 — Evidence Richness (edge THICKNESS)
+        const ewA = new Set(evA.flatMap(e => e.text.split(/[\s，。]+/).filter(w => w.length > 3)));
+        const ewB = new Set(evB.flatMap(e => e.text.split(/[\s，。]+/).filter(w => w.length > 3)));
+        const evOv = Math.min([...ewA].filter(w => ewB.has(w)).length, 8);
+        const evTotal = Math.min((evA.length + evB.length) / 2, 10);
+        const evidence = Math.min(90, Math.round(
+          jaccardSrc * 40        // source Jaccard
+          + Math.sqrt(evOv) * 14 // sqrt-scaled evidence word overlap
+          + Math.sqrt(evTotal) * 8 // sqrt-scaled evidence count
+        ));
+
+        map[pa.id][pb.id] = {
+          similarity: Math.round(similarity * 10) / 10,
+          business:   Math.round(business  * 10) / 10,
+          evidence:   Math.round(evidence  * 10) / 10,
+        };
+      });
+    });
+    return map;
+  }, [allProjects, allClaims, allSources, allInsights, allEvidence]);
+
+  // Return absolute 0-1 score for a dimension (raw/100, not relative to max)
+  // This prevents the most-similar project from always showing 100% (looks like self-data)
+  const getRelDim = (focalProjId: string, targetId: string, dim: keyof RelDims): number => {
+    const rels = relationMap[focalProjId] ?? {};
+    return Math.min((rels[targetId]?.[dim] ?? 0) / 100, 1);
+  };
+
+  // Combined strength (weighted avg)
+  const getRelStrength = (focalProjId: string, targetId: string): number => {
+    return getRelDim(focalProjId, targetId, "similarity") * 0.4
+         + getRelDim(focalProjId, targetId, "business")   * 0.4
+         + getRelDim(focalProjId, targetId, "evidence")   * 0.2;
+  };
+
+
+  // ── Build nodes & edges ────────────────────────────────────────────────
+  type WTNode = { id:string; type:"root"|"collection"|"project"|"insight"|"claim"|"evidence"|"source"; label:string; sub?:string; bx:number; by:number; color:string; weight:number; projId?:string; collId?:string; navId?:string; timestamp?:string };
+  const NC = { root:"#6366f1", collection:"#0ea5e9", project:"#4f46e5", insight:"#7c3aed", claim:"#d97706", evidence:"#16a34a", source:"#3b82f6" };
+
+  const { nodes, autoEdges } = useMemo(() => {
+    const ns: WTNode[] = [{ id:"__root__", type:"root", label:"世界树", bx:WCX, by:WCY, color:NC.root, weight:10 }];
+    const es: Array<{ from:string; to:string; color:string; w:number }> = [];
+
+    // Single combined ring: projects (collections removed — shown as sub-label on project nodes)
+    const ps = allProjects.slice(0, 12);
+    ps.forEach((p, i) => {
+      const a = (i / ps.length) * 2 * Math.PI - Math.PI/2;
+      const projX = WCX + R_PROJ * Math.cos(a);
+      const projY = WCY + R_PROJ * Math.sin(a);
+      const weight = p.sourceIds.length + p.claimIds.length + p.insightIds.length;
+      const nodeWeight = Math.max(1, Math.min(weight / 5, 3));
+      // Find which collection this project's sources belong to (for sub-label)
+      const collName = allCollections.find(c => c.sourceIds.some(sid => p.sourceIds.includes(sid)))?.name ?? "";
+      // Project position on the ring
+      ns.push({
+        id:p.id, type:"project",
+        label:p.name.slice(0,15)+(p.name.length>15?"…":""),
+        // Sub: collection name + stats (merged info)
+        sub:`${collName ? collName.slice(0,12) + " · " : ""}${p.sourceIds.length} 资料 · ${allClaims.filter(c=>c.projectId===p.id).length} 观点`,
+        bx:projX, by:projY, color:NC.project, weight:nodeWeight, navId:p.id
+      });
+      es.push({ from:"__root__", to:p.id, color:NC.project, w:2 });
+
+      // Leaf nodes — extend FROM the project node outward, not from canvas center
+      const leaves = [
+        ...allInsights.filter(i=>i.projectId===p.id).slice(0,5).map(ins=>({ id:ins.id, type:"insight" as const, label:ins.title, color:NC.insight, timestamp:undefined })),
+        ...allClaims.filter(c=>c.projectId===p.id).slice(0,5).map(c=>({ id:c.id, type:"claim" as const, label:c.text, color:NC.claim, timestamp:c.createdAt })),
+        ...allEvidence.filter(e=>e.projectId===p.id).slice(0,3).map(e=>({ id:e.id, type:"evidence" as const, label:e.text, color:NC.evidence, timestamp:e.createdAt })),
+      ];
+      const LEAF_BASE = 175; // base distance from project node to leaf
+      leaves.forEach((leaf, j) => {
+        // Fan leaves around the outward direction (same angle as project from center)
+        const fanOffset = (j - (leaves.length - 1) / 2) * 0.42;
+        const leafAngle = a + fanOffset;
+        const leafDist = LEAF_BASE + (j % 4) * 48;
+        ns.push({
+          ...leaf,
+          label: leaf.label.slice(0,24)+(leaf.label.length>24?"…":""),
+          sub: undefined,
+          // Position relative to parent project node
+          bx: projX + leafDist * Math.cos(leafAngle),
+          by: projY + leafDist * Math.sin(leafAngle),
+          weight: 1,
+          projId: p.id,
+        });
+        es.push({ from:p.id, to:leaf.id, color:leaf.color, w:1.2 });
+      });
+    });
+    return { nodes:ns, autoEdges:es };
+  }, [allProjects, allCollections, allClaims, allInsights, allEvidence, WCX, WCY]);
+
+  const getBasePos = (id: string) => {
+    const n = nodes.find(n => n.id === id);
+    const raw = posOvr[id] ?? (n ? { x:n.bx, y:n.by } : { x:WCX, y:WCY });
+    // Leaf nodes follow parent project when project has been dragged
+    if (n?.projId && !posOvr[id]) {
+      const proj = nodes.find(p => p.id === n.projId);
+      if (proj && posOvr[n.projId!]) {
+        return { x: raw.x + (posOvr[n.projId!].x - proj.bx), y: raw.y + (posOvr[n.projId!].y - proj.by) };
+      }
+    }
+    return raw;
+  };
+
+  // In analysis mode: focal project snaps to center; others position by businessScore
+  const getPos = (id: string): { x:number; y:number } => {
+    const base = getBasePos(id);
+    if (!focalId) return base;
+
+    // Focal project — can be dragged freely; default to canvas center
+    if (id === focalId) return posOvr[focalId] ?? { x: WCX, y: WCY };
+    // Root node → push off-screen in analysis mode
+    if (id === "__root__") return { x: -9999, y: -9999 };
+
+    const node = nodes.find(n => n.id === id);
+    if (!node || node.type !== "project") return base;
+
+    // All other project nodes orbit the FOCAL NODE's current position (incl. drag offset)
+    // This way dragging the focal node moves the entire cluster
+    const focalCenter = posOvr[focalId] ?? { x: WCX, y: WCY };
+
+    // Distance from focal determined by businessScore (higher → closer)
+    const bizRel = getRelDim(focalId, id, "business");
+    const MIN_D = 130, MAX_D = 420;
+    const targetDist = MIN_D + (1 - bizRel) * (MAX_D - MIN_D);
+
+    // Angular direction: keep original angle from canvas center so layout is stable
+    const dx = base.x - WCX, dy = base.y - WCY;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 200;
+    return {
+      x: focalCenter.x + (dx/dist) * targetDist,
+      y: focalCenter.y + (dy/dist) * targetDist,
+    };
+  };
+
+  // ── Group-organize rigid column layout ────────────────────────────────
+  // Three vertical columns — ORDER: 观点(Claims) | 证据(Evidence) | 洞察(Insights)
+  const ZONE_CFG = {
+    claim:    { colX: -340, color: "#d97706", label: "观点", icon: "💡" },
+    evidence: { colX:    0, color: "#16a34a", label: "证据", icon: "📎" },
+    insight:  { colX: +340, color: "#7c3aed", label: "洞察", icon: "✨" },
+  } as const;
+  const ZONE_VGAP = 62;
+  const ZONE_Y_START = 126; // items start here below project center (header is at -48, so 72px for header)
+
+  const getGroupedLeafPos = (node: { id:string; type:string; projId?:string }): { x:number; y:number } | null => {
+    if (!groupId || node.projId !== groupId) return null;
+    const cfg = ZONE_CFG[node.type as keyof typeof ZONE_CFG];
+    if (!cfg) return null;
+    const projPos = getPos(groupId);
+    const siblings = nodes.filter(n => n.projId === groupId && n.type === node.type);
+    const idx = siblings.findIndex(n => n.id === node.id);
+    return {
+      x: projPos.x + cfg.colX,
+      y: projPos.y + ZONE_Y_START + idx * ZONE_VGAP,
+    };
+  };
+
+  // ── Filtered nodes for focus / search ─────────────────────────────────
+  const visibleNodes = useMemo(() => {
+    let vis = nodes.filter(n => {
+      // ── Organize mode: show ONLY the grouped project + its leaf nodes ──
+      if (groupId) {
+        if (n.type === "root" || n.type === "collection") return false; // hide root & collections
+        if (n.type === "project") return n.id === groupId; // only the focused project
+        if (n.projId) return n.projId === groupId && expanded.has(n.projId);
+        return false;
+      }
+      // ── Normal browse / analysis mode ──
+      if (n.type === "root") return true;
+      if (n.type === "collection") return true;
+      if (n.type === "project") return !focusId || n.id === focusId;
+      if (n.projId) return expanded.has(n.projId) && (!focusId || n.projId === focusId);
+      return true;
+    });
+    if (searchQ.trim()) {
+      const q = searchQ.toLowerCase();
+      vis = vis.filter(n => n.id === "__root__" || n.label.toLowerCase().includes(q) || n.sub?.toLowerCase().includes(q));
+    }
+    return vis;
+  }, [nodes, expanded, focusId, searchQ, groupId]);
+
+  // In organize mode: suppress auto edges (zone SVG renders cleaner connectors)
+  const visEdges = groupId
+    ? [] // no auto edges in organize mode — zone backgrounds draw their own lines
+    : autoEdges.filter(e => visibleNodes.some(n=>n.id===e.from) && visibleNodes.some(n=>n.id===e.to));
+
+  // ── Pointer handlers ───────────────────────────────────────────────────
+  const onContainerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest(".wt-node")) return;
+    isPanRef.current = true;
+    panRef.current = { sx:e.clientX, sy:e.clientY, px:pan.x, py:pan.y };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+  const onContainerMove = (e: React.PointerEvent) => {
+    if (nodeDragRef.current) {
+      const dx = e.clientX - nodeDragRef.current.sx, dy = e.clientY - nodeDragRef.current.sy;
+      if (Math.abs(dx)+Math.abs(dy) > 3) { nodeDragRef.current.moved = true; isDraggingRef.current = true; }
+      setPosOvr(v => ({ ...v, [nodeDragRef.current!.id]: { x:nodeDragRef.current!.ox + dx/zoom, y:nodeDragRef.current!.oy + dy/zoom } }));
+    } else if (isPanRef.current && panRef.current) {
+      setPan({ x:panRef.current.px + e.clientX - panRef.current.sx, y:panRef.current.py + e.clientY - panRef.current.sy });
+    }
+  };
+  const onContainerUp = () => { isPanRef.current = false; panRef.current = null; setTimeout(()=>{ isDraggingRef.current = false; nodeDragRef.current = null; }, 50); };
+
+  const onNodeDown = (e: React.PointerEvent, id: string) => {
+    if (linkMode) return;
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    const p = getPos(id);
+    nodeDragRef.current = { id, ox:p.x, oy:p.y, sx:e.clientX, sy:e.clientY, moved:false };
+  };
+
+  const onNodeClick = (e: React.MouseEvent, node: WTNode) => {
+    if (isDraggingRef.current) return;
+    if (linkMode) {
+      if (!linkSrc) { setLinkSrc(node.id); return; }
+      if (linkSrc === node.id) { setLinkSrc(null); return; }
+      setPendingEdge({ from:linkSrc, to:node.id }); setLinkSrc(null); return;
+    }
+
+    // Reliable double-click detection using timestamp
+    const now = Date.now();
+    const isDoubleClick = lastNodeClickRef.current?.id === node.id && (now - lastNodeClickRef.current.time) < 380;
+    lastNodeClickRef.current = { id: node.id, time: now };
+
+    if (node.type === "project") {
+      if (groupMode) {
+        const newGroupId = node.id;
+        const isToggleOff = groupId === newGroupId;
+        setGroupId(isToggleOff ? null : newGroupId);
+        // On entering organize: clear posOvr for this project's leaf nodes
+        // so they always land in clean column positions
+        if (!isToggleOff) {
+          setPosOvr(prev => {
+            const next = { ...prev };
+            nodes.filter(n => n.projId === newGroupId).forEach(n => { delete next[n.id]; });
+            return next;
+          });
+        }
+        setProjInfoId(null); setLeafInfoId(null); setFocalId(null);
+        return;
+      }
+      // Double-click → navigate to project workspace
+      if (isDoubleClick) {
+        if (node.navId) { setSelectedProject(node.navId); setActiveView("projects"); }
+        setProjInfoId(null); setFocalId(null);
+        return;
+      }
+      // Analysis mode: single click = switch focal
+      if (focalId !== null) {
+        setFocalId(f => f === node.id ? null : node.id);
+        setPanelPos(null); setAiRelNote(null); setProjInfoId(null);
+        return;
+      }
+      // Ctrl/Cmd + click → analysis mode
+      if (e.metaKey || e.ctrlKey) {
+        setFocalId(node.id); setPanelPos(null); setAiRelNote(null); setProjInfoId(null);
+        return;
+      }
+      // Single click → info popup
+      setProjInfoId(id => id === node.id ? null : node.id);
+      setLeafInfoId(null);
+      return;
+    }
+    // Collection: navigate
+    if (node.type === "collection" && node.collId) { setActiveView("collections"); return; }
+    // Leaf nodes: single click → show full content popup (not navigate)
+    if (node.type==="insight"||node.type==="claim"||node.type==="evidence") {
+      setLeafInfoId(id => id === node.id ? null : node.id);
+      setProjInfoId(null);
+    }
+  };
+
+  // ── Export PNG ────────────────────────────────────────────────────────
+  const exportPNG = async () => {
+    if (!containerRef.current) return;
+    try {
+      const { default: html2canvas } = await import("html2canvas" as never) as { default: (el: HTMLElement, opts?: object) => Promise<HTMLCanvasElement> };
+      const canvas = await html2canvas(containerRef.current, { backgroundColor: null, scale: 2 });
+      const link = document.createElement("a"); link.download = "world-tree.png"; link.href = canvas.toDataURL(); link.click();
+    } catch { alert("需要安装 html2canvas 依赖，暂时请截图代替"); }
+  };
+
+  // Shared double-click handler for ALL project nodes — navigates immediately
+  const onProjDblClick = (e: React.MouseEvent, node: WTNode) => {
+    e.stopPropagation();
+    if (isDraggingRef.current) return;
+    if (node.navId) { setSelectedProject(node.navId); setActiveView("projects"); }
+    setProjInfoId(null); setFocalId(null);
+  };
+
+  const totalKnow = allProjects.length + allClaims.length + allInsights.length + allEvidence.length + allCollections.length;
+
+  return (
+    <div className={`wt-outer ${isFS ? "wt-fullscreen" : ""}`}>
+      {/* ── Toolbar ── */}
+      <div className="wt-toolbar-bar">
+        <div className="wt-title-group">
+          <span className="wt-toolbar-title">🌳 {english ? "World Tree" : "世界树"}</span>
+          {focalId ? (
+            <span className="wt-mode-pill wt-mode-analysis">◉ {english ? "Analysis Mode" : "分析模式"}</span>
+          ) : (
+            <span className="wt-node-count">{totalKnow} {english ? "nodes" : "个节点"}</span>
+          )}
+          {focusId && !focalId && <span className="wt-focus-pill">◉ 聚焦中 · 双击退出</span>}
+        </div>
+        <div className="wt-btn-row">
+          {/* Search */}
+          <div className="wt-btn-group">
+            {showSearch ? (
+              <input autoFocus value={searchQ} onChange={e=>setSearchQ(e.target.value)} onBlur={()=>{if(!searchQ)setShowSearch(false);}} placeholder="搜索节点…" className="wt-search-input"/>
+            ) : (
+              <button className="wt-icon-btn" onClick={()=>setShowSearch(true)} data-tip="搜索节点"><Search size={14}/></button>
+            )}
+            {searchQ && <button className="wt-icon-btn" onClick={()=>{setSearchQ("");setShowSearch(false);}} data-tip="清除搜索"><X size={14}/></button>}
+          </div>
+          {/* Zoom */}
+          <div className="wt-btn-group">
+            <button className="wt-icon-btn" onClick={()=>zoomAround(0.83)} data-tip="缩小 (滚轮↓)"><ZoomOut size={14}/></button>
+            <span className="wt-zoom-chip">{Math.round(zoom*100)}%</span>
+            <button className="wt-icon-btn" onClick={()=>zoomAround(1.2)} data-tip="放大 (滚轮↑)"><ZoomIn size={14}/></button>
+            <button className="wt-icon-btn" onClick={()=>{ if(!containerRef.current) return; const {clientWidth:cw,clientHeight:ch}=containerRef.current; const nz=0.72; setZoom(nz); setPan({x:cw/2-WCX*nz,y:ch/2-WCY*nz}); }} data-tip="适应视图 — 居中显示全部节点"><Locate size={14}/></button>
+          </div>
+          {/* Actions */}
+          <div className="wt-btn-group">
+            {/* Group-organize mode toggle */}
+            <button
+              className={`wt-icon-btn wt-group-btn ${groupMode?"active":""}`}
+              onClick={() => { setGroupMode(g => !g); if (groupMode) setGroupId(null); }}
+              data-tip={groupMode ? "退出整理模式" : "整理分类 — 点击项目按类型聚拢洞察/观点/证据"}>
+              <LayoutGrid size={14}/>{groupMode&&<span className="wt-btn-dot"/>}
+            </button>
+            <button onClick={()=>{setLinkMode(l=>!l);setLinkSrc(null);}} className={`wt-icon-btn wt-link-icon ${linkMode?"active":""}`} data-tip={linkMode?"退出关联模式":"手动关联节点 — 点击源节点再点目标节点"}>
+              <Link2 size={14}/>{linkMode&&<span className="wt-btn-dot"/>}
+            </button>
+            <button className="wt-icon-btn" onClick={()=>setShowLegend(l=>!l)} data-tip="显示/隐藏图例"><BookOpen size={14}/></button>
+            <button className="wt-icon-btn" onClick={()=>{setPosOvr({});setUserEdgesRaw([]);setLinkMode(false);setExpanded(new Set());setFocusId(null);setGroupId(null);setGroupMode(false);localStorage.removeItem(WT_STORAGE_KEY);}} data-tip="重置布局 — 清除所有自定义位置和关联线"><RotateCcw size={14}/></button>
+            <button className="wt-icon-btn" onClick={exportPNG} data-tip="导出 PNG — 保存当前视图为图片"><Download size={14}/></button>
+          </div>
+          {/* Fullscreen */}
+          <button className={`wt-icon-btn wt-fs-btn ${isFS?"active":""}`} onClick={()=>setIsFS(f=>!f)} data-tip={isFS?"退出全屏":"全屏无限画布"}>
+            {isFS?<Minimize2 size={14}/>:<Maximize2 size={14}/>}
+          </button>
+        </div>
+      </div>
+
+
+      {/* ── Canvas ── */}
+      <div ref={containerRef} className="wt-canvas-wrap" onPointerDown={onContainerDown} onPointerMove={onContainerMove} onPointerUp={onContainerUp} onPointerLeave={onContainerUp} onWheel={onWheel}>
+
+        {/* Dot grid — hidden in organize mode */}
+        {!groupId && (
+        <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",opacity:0.35}}>
+          <defs><pattern id="wt-grid" x={pan.x%(24*zoom)} y={pan.y%(24*zoom)} width={24*zoom} height={24*zoom} patternUnits="userSpaceOnUse">
+            <circle cx={12*zoom} cy={12*zoom} r={1} fill="var(--text-muted)" opacity="0.3"/>
+          </pattern></defs>
+          <rect width="100%" height="100%" fill="url(#wt-grid)"/>
+        </svg>
+        )}
+
+        {/* World transform */}
+        <div className="wt-world" style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`,transformOrigin:"0 0",width:WW,height:WH}}>
+          <svg style={{position:"absolute",inset:0,width:WW,height:WH,pointerEvents:"none",overflow:"visible"}}>
+            <defs>
+              <filter id="wt-glow3"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <radialGradient id="wt-aura2" cx="50%" cy="50%"><stop offset="0%" stopColor="rgba(99,102,241,0.1)"/><stop offset="100%" stopColor="rgba(99,102,241,0)"/></radialGradient>
+            </defs>
+
+            {/* Background: soft aura in browse mode, orbit rings in analysis mode */}
+            {!focalId && !groupId && <ellipse cx={WCX} cy={WCY} rx={320} ry={270} fill="url(#wt-aura2)"/>}
+            {focalId && (
+              <g>
+                {/* Orbit distance rings — innermost = highest business relevance */}
+                <circle cx={WCX} cy={WCY} r={140}  fill="none" stroke="rgba(99,102,241,0.18)" strokeWidth="1.5" strokeDasharray="7 5"/>
+                <circle cx={WCX} cy={WCY} r={260}  fill="none" stroke="rgba(99,102,241,0.10)" strokeWidth="1"   strokeDasharray="7 5"/>
+                <circle cx={WCX} cy={WCY} r={410}  fill="none" stroke="rgba(99,102,241,0.06)" strokeWidth="1"   strokeDasharray="7 5"/>
+                {/* Ring labels */}
+                <text x={WCX+143} y={WCY-5} fill="rgba(99,102,241,0.45)" fontSize="11" fontWeight="700">强业务关联</text>
+                <text x={WCX+263} y={WCY-5} fill="rgba(99,102,241,0.30)" fontSize="11" fontWeight="700">中等关联</text>
+                <text x={WCX+413} y={WCY-5} fill="rgba(99,102,241,0.20)" fontSize="11" fontWeight="700">弱关联</text>
+              </g>
+            )}
+
+            {/* Auto edges — normal mode OR analysis mode with thickness encoding */}
+            {visEdges.map((e,i)=>{
+              const f=getPos(e.from),t=getPos(e.to);
+              if (focalId && (e.from === "__root__" || e.to === "__root__")) return null;
+              if (focalId && (e.from.startsWith("coll-") || e.to.startsWith("coll-"))) return null;
+              // In analysis mode, skip edges NOT involving the focal project (clean visual)
+              if (focalId && e.from !== focalId && e.to !== focalId) return null;
+              const mx=(f.x+t.x)/2,my=(f.y+t.y)/2-38;
+              const active=hoverId===e.from||hoverId===e.to;
+              const focus = focusId && (e.from !== "__root__" ? e.from !== focusId && e.to !== focusId : false);
+              const evRel = focalId ? (
+                e.from === focalId ? getRelDim(focalId, e.to,   "evidence") :
+                e.to   === focalId ? getRelDim(focalId, e.from, "evidence") : 0
+              ) : 0.5;
+              // Edge thickness: 1.5px (no evidence) → 9px (rich evidence)
+              const strokeW = focalId ? Math.max(1.5, 1.5 + evRel * 7.5) : (active ? e.w+1 : e.w);
+              const opacity  = focalId ? Math.max(0.18, 0.18 + evRel * 0.65) : (focus ? 0.06 : active ? 0.85 : 0.5);
+              // Color based on evidence richness: gray → green
+              const edgeColor = focalId ? `hsl(${Math.round(160 + evRel*60)},${Math.round(30+evRel*55)}%,${Math.round(35+evRel*25)}%)` : e.color;
+              return (
+                <g key={`ae${i}`}>
+                  {(active||focalId)&&<path d={`M${f.x} ${f.y} Q${mx} ${my} ${t.x} ${t.y}`} stroke={edgeColor} strokeWidth={strokeW+4} fill="none" opacity="0.12" filter="url(#wt-glow3)"/>}
+                  <path d={`M${f.x} ${f.y} Q${mx} ${my} ${t.x} ${t.y}`} stroke={edgeColor} strokeWidth={strokeW} fill="none" opacity={opacity} style={{transition:"stroke-width 0.5s ease, opacity 0.4s"}}/>
+                  {/* Evidence % label on edge midpoint in analysis mode */}
+                  {focalId && evRel > 0.1 && (
+                    <text x={mx} y={my-8} textAnchor="middle" fill={edgeColor} fontSize="11" fontWeight="800" opacity="0.8">
+                      {Math.round(evRel*100)}%
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+
+            {/* ── Group-organize zone backgrounds ── */}
+            {groupId && (() => {
+              const proj = nodes.find(n => n.id === groupId);
+              if (!proj) return null;
+              const center = getPos(groupId);
+
+              // Project title header — appears above the three columns
+              const titleY = center.y - 60;
+              const projFull = allProjects.find(p => p.id === groupId);
+              const titleElements = (
+                <g key="__title__">
+                  {/* Title background pill */}
+                  <rect
+                    x={center.x - 160} y={titleY - 18} width={320} height={36}
+                    rx={10}
+                    fill="rgba(99,102,241,0.12)" stroke="rgba(99,102,241,0.3)" strokeWidth="1.5"
+                  />
+                  <text x={center.x} y={titleY + 5} textAnchor="middle"
+                    fill="#4338ca" fontSize="14" fontWeight="800" letterSpacing="-0.01em">
+                    {projFull?.name.slice(0, 28) ?? proj.label}
+                  </text>
+                  {/* Branch lines from title to each column header */}
+                  {(Object.entries(ZONE_CFG) as [keyof typeof ZONE_CFG, typeof ZONE_CFG[keyof typeof ZONE_CFG]][]).map(([type, cfg]) => {
+                    const colX = center.x + cfg.colX;
+                    const headerY = center.y + ZONE_Y_START - 44;
+                    return (
+                      <path key={type}
+                        d={`M${center.x} ${titleY + 18} Q${(center.x + colX)/2} ${center.y + 10} ${colX} ${headerY}`}
+                        fill="none" stroke={`${cfg.color}45`} strokeWidth="1.5" strokeDasharray="6 4"
+                      />
+                    );
+                  })}
+                </g>
+              );
+
+              return [titleElements, ...(Object.entries(ZONE_CFG) as [keyof typeof ZONE_CFG, typeof ZONE_CFG[keyof typeof ZONE_CFG]][]).map(([type, cfg]) => {
+                const count = nodes.filter(n => n.projId === groupId && n.type === type).length;
+                if (count === 0) return null;
+                const colX = center.x + cfg.colX;
+                // Header starts above ZONE_Y_START, content starts at ZONE_Y_START
+                const headerY = center.y + ZONE_Y_START - 48;
+                // Total height: header (48) + items (count * ZONE_VGAP) + bottom padding (36)
+                const totalH = 48 + count * ZONE_VGAP + 36;
+                const colW = 200; // column background width — node width is 178, so 11px padding each side
+                return (
+                  <g key={type}>
+                    {/* Column outer background */}
+                    <rect
+                      x={colX - colW/2} y={headerY - 2}
+                      width={colW} height={totalH}
+                      rx={10}
+                      fill={`${cfg.color}07`}
+                      stroke={`${cfg.color}28`}
+                      strokeWidth="1.2"
+                    />
+                    {/* Column header bar */}
+                    <rect
+                      x={colX - colW/2} y={headerY - 2}
+                      width={colW} height={34}
+                      rx={10} fill={`${cfg.color}18`}
+                    />
+                    {/* Column header text */}
+                    <text x={colX - 14} y={headerY + 18} textAnchor="middle"
+                      fill={cfg.color} fontSize="13" fontWeight="800">
+                      {cfg.icon} {cfg.label}
+                    </text>
+                    <text x={colX + 46} y={headerY + 18} textAnchor="start"
+                      fill={cfg.color} fontSize="10" fontWeight="600" opacity="0.5">
+                      {count} 条
+                    </text>
+                    {/* Left accent stripe */}
+                    <rect
+                      x={colX - colW/2} y={headerY + 32}
+                      width={4} height={totalH - 34}
+                      rx={2} fill={`${cfg.color}30`}
+                    />
+                    {/* Row dividers — one per item */}
+                    {Array.from({length: count - 1}).map((_, i) => (
+                      <line key={i}
+                        x1={colX - colW/2 + 10} y1={headerY + 48 + (i + 1) * ZONE_VGAP - ZONE_VGAP/2}
+                        x2={colX + colW/2 - 4}  y2={headerY + 48 + (i + 1) * ZONE_VGAP - ZONE_VGAP/2}
+                        stroke={`${cfg.color}15`} strokeWidth="1"
+                      />
+                    ))}
+                    {/* Connector from title area to column header */}
+                    <path
+                      d={`M${center.x} ${center.y + ZONE_Y_START - 60} Q${(center.x + colX)/2} ${center.y + ZONE_Y_START - 30} ${colX} ${headerY + 16}`}
+                      fill="none" stroke={`${cfg.color}28`} strokeWidth="1.5" strokeDasharray="5 4"
+                    />
+                  </g>
+                );
+              })];
+            })()}
+
+            {/* User edges — hidden in organize mode for clean layout */}
+            {!groupId && userEdges.map(e=>{
+              const f=getPos(e.from),t=getPos(e.to);
+              const mx=(f.x+t.x)/2,my=(f.y+t.y)/2-28;
+              const rel=REL_TYPES.find(r=>r.id===e.rel)||REL_TYPES[4];
+              return (
+                <g key={e.id}>
+                  <path d={`M${f.x} ${f.y} Q${mx} ${my} ${t.x} ${t.y}`} stroke={rel.color} strokeWidth="2" fill="none" opacity="0.75" strokeDasharray="7 4" className="wt-user-edge"/>
+                  <text x={mx} y={my-10} textAnchor="middle" fill={rel.color} fontSize="18" fontWeight="700" style={{pointerEvents:"all",cursor:"pointer"}} onClick={()=>setUserEdges(v=>v.filter(x=>x.id!==e.id))}>
+                    <title>点击删除关联</title>·
+                  </text>
+                  <text x={mx} y={my-18} textAnchor="middle" fill={rel.color} fontSize="14" fontWeight="600" opacity="0.85">{rel.label}</text>
+                </g>
+              );
+            })}
+
+            {/* Link preview */}
+            {linkSrc&&hoverId&&hoverId!==linkSrc&&(()=>{const f=getPos(linkSrc),t=getPos(hoverId);return<path d={`M${f.x} ${f.y} L${t.x} ${t.y}`} stroke="var(--accent)" strokeWidth="2" strokeDasharray="5 3" fill="none" opacity="0.6"/>; })()}
+          </svg>
+
+          {/* Nodes */}
+          {visibleNodes.map((node,ni)=>{
+            const pos=getPos(node.id);
+            const isHov=hoverId===node.id;
+            const isLSrc=linkSrc===node.id;
+            const inSearch=searchQ&&node.label.toLowerCase().includes(searchQ.toLowerCase());
+            const delay=`${(ni%9)*0.25}s`;
+            const shouldFloat=!nodeDragRef.current;
+
+            if(node.type==="root") return (
+              <div key={node.id} className={`wt-node wt-root-node ${!shouldFloat?"no-float":""}`} style={{left:pos.x,top:pos.y,animationDelay:delay,animationPlayState:shouldFloat?"running":"paused"}}
+                onPointerDown={e=>onNodeDown(e,node.id)} onClick={e=>onNodeClick(e,node)}
+                onMouseEnter={()=>setHoverId(node.id)} onMouseLeave={()=>setHoverId(null)}>
+                <WTTreeIcon size={36}/>
+                <span className="wt-root-label">世界树</span>
+                <span style={{fontSize:9,color:"rgba(255,255,255,0.6)",fontWeight:500}}>{allProjects.length} 项目</span>
+              </div>
+            );
+
+            if(node.type==="collection") return (
+              <div key={node.id} className={`wt-node wt-coll-node ${isHov?"hov":""} ${isLSrc?"linksrc":""} ${inSearch?"wt-search-hit":""}`}
+                style={{left:pos.x,top:pos.y,animationDelay:delay}} onPointerDown={e=>onNodeDown(e,node.id)} onClick={e=>onNodeClick(e,node)} onMouseEnter={()=>setHoverId(node.id)} onMouseLeave={()=>setHoverId(null)}>
+                <span className="wt-coll-icon">📁</span>
+                <div>
+                  <strong className="wt-proj-name">{node.label}</strong>
+                  <span className="wt-proj-sub">{node.sub}</span>
+                  {/* Type badge so users can distinguish collection from project */}
+                  <span style={{display:"inline-block",fontSize:8.5,fontWeight:800,color:"#0ea5e9",background:"rgba(14,165,233,0.1)",border:"1px solid rgba(14,165,233,0.25)",borderRadius:4,padding:"1px 5px",marginTop:3,letterSpacing:"0.02em"}}>主题夹</span>
+                </div>
+              </div>
+            );
+
+            if(node.type==="project"){
+              const isExp=expanded.has(node.id);
+              const isFoc=focusId===node.id;
+              const isFocal=focalId===node.id;
+              const leafCt=allClaims.filter(c=>c.projectId===node.id).length+allInsights.filter(i=>i.projectId===node.id).length;
+
+              // 3D visual encoding (analysis mode)
+              const simRel = focalId && !isFocal ? getRelDim(focalId, node.id, "similarity") : (isFocal ? 1 : 0.5);
+              const bizRel = focalId && !isFocal ? getRelDim(focalId, node.id, "business")   : (isFocal ? 1 : 0.5);
+              const gravOpacity = focalId && !isFocal ? Math.max(0.25, 0.4 + simRel * 0.6) : 1;
+
+              // ── ANALYSIS MODE: Circular nodes with clear size variation ──
+              if (focalId && !isFocal) {
+                // Diameter: 64px (0% similar) → 168px (100% similar) — very obvious range
+                const diameter = Math.round(64 + simRel * 104);
+                const simPct = Math.round(simRel * 100);
+                const bizPct = Math.round(bizRel * 100);
+                // Color intensity based on similarity: from muted blue-gray to vivid indigo
+                const hue = 234; // indigo hue
+                const sat = Math.round(30 + simRel * 55); // 30-85% saturation
+                const lgt = Math.round(28 + simRel * 12); // 28-40% lightness (dark)
+                const glowAlpha = Math.round(simRel * 40); // 0-40% glow
+                return (
+                  <div key={node.id}
+                    className={`wt-node wt-analysis-circle ${isHov?"hov":""} ${inSearch?"wt-search-hit":""}`}
+                    style={{
+                      left:pos.x, top:pos.y,
+                      width:diameter, height:diameter, borderRadius:"50%",
+                      opacity: gravOpacity,
+                      // Size = similarity → bigger = more similar
+                      background: `radial-gradient(circle at 38% 32%, hsl(${hue},${sat}%,${lgt+16}%) 0%, hsl(${hue},${sat}%,${lgt}%) 100%)`,
+                      boxShadow: `0 0 0 ${Math.round(simRel*10+2)}px hsla(${hue},${sat}%,60%,${glowAlpha/100}), 0 6px 24px rgba(0,0,0,0.22)`,
+                      border: `${Math.round(1+simRel*1.5)}px solid hsla(${hue},80%,72%,0.35)`,
+                      transition:"left 0.72s cubic-bezier(0.34,1.56,0.64,1), top 0.72s cubic-bezier(0.34,1.56,0.64,1), width 0.5s, height 0.5s, opacity 0.45s",
+                      cursor:"pointer", userSelect:"none",
+                    }}
+                    onPointerDown={e=>onNodeDown(e,node.id)} onClick={e=>onNodeClick(e,node)}
+                    onDoubleClick={e=>onProjDblClick(e,node)}
+                    onMouseEnter={()=>setHoverId(node.id)} onMouseLeave={()=>setHoverId(null)}
+                    title={`${node.label}\n相似度 ${simPct}% · 业务关联 ${bizPct}%\n单击设为分析基点 · 双击进入项目`}>
+                    {/* Project name */}
+                    <strong style={{
+                      display:"block", textAlign:"center", color:"rgba(255,255,255,0.92)",
+                      fontSize:Math.max(9,Math.min(13,Math.round(9+simRel*4)))+"px",
+                      fontWeight:780, lineHeight:1.25, padding:`0 ${Math.round(diameter*0.1)}px`,
+                      overflow:"hidden", wordBreak:"break-all",
+                      maxHeight:diameter*0.55+"px",
+                    }}>{node.label}</strong>
+                    {/* Similarity % — shows the data */}
+                    <span style={{
+                      display:"block", textAlign:"center",
+                      color:"rgba(255,255,255,0.6)", fontSize:"9px", fontWeight:800,
+                      marginTop:2, letterSpacing:"0.02em",
+                    }}>{simPct}%</span>
+                    {/* Navigate button */}
+                    {node.navId && (
+                      <button
+                        style={{
+                          position:"absolute", bottom:4, right:4,
+                          width:18, height:18, borderRadius:"50%", border:"none", padding:0,
+                          background:"rgba(255,255,255,0.18)", color:"rgba(255,255,255,0.8)",
+                          fontSize:10, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+                          opacity: isHov ? 1 : 0, transition:"opacity 0.15s",
+                        }}
+                        title="进入项目"
+                        onClick={e => { e.stopPropagation(); setSelectedProject(node.navId!); setActiveView("projects"); }}>
+                        ↗
+                      </button>
+                    )}
+                  </div>
+                );
+              }
+
+              // ── FOCAL CENTER node ──
+              if (isFocal) {
+                return (
+                  <div key={node.id}
+                    className={`wt-node wt-root-node ${isHov?"hov":""}`}
+                    style={{
+                      left:pos.x, top:pos.y, width:110, height:110,
+                      animationDelay:delay, cursor:"pointer",
+                    }}
+                    onPointerDown={e=>onNodeDown(e,node.id)} onClick={e=>onNodeClick(e,node)}
+                    onDoubleClick={e=>onProjDblClick(e,node)}
+                    onMouseEnter={()=>setHoverId(node.id)} onMouseLeave={()=>setHoverId(null)}
+                    title="双击进入项目 · 单击退出分析模式">
+                    <strong style={{fontSize:12,color:"rgba(255,255,255,0.95)",fontWeight:800,textAlign:"center",padding:"0 8px",lineHeight:1.3}}>{node.label}</strong>
+                    <span className="wt-focal-badge" style={{marginTop:4}}>分析基点</span>
+                    {node.navId && (
+                      <button className="wt-nav-btn" title="进入项目"
+                        onClick={e => { e.stopPropagation(); setSelectedProject(node.navId!); setActiveView("projects"); }}>↗</button>
+                    )}
+                  </div>
+                );
+              }
+
+              // ── BROWSE MODE: standard rectangular card ──
+              const baseW = Math.max(130, Math.min(190, 130 + node.weight * 12));
+              const relStr = 0;
+              return (
+                <div key={node.id}
+                  className={`wt-node wt-proj-node ${isHov||isFoc?"hov":""} ${isLSrc?"linksrc":""} ${isFoc?"focused":""} ${inSearch?"wt-search-hit":""}`}
+                  style={{ left:pos.x, top:pos.y, animationDelay:delay, width:baseW, transition:"left 0.72s cubic-bezier(0.34,1.56,0.64,1), top 0.72s cubic-bezier(0.34,1.56,0.64,1), opacity 0.45s, width 0.45s, transform 0.45s" }}
+                  onPointerDown={e=>onNodeDown(e,node.id)} onClick={e=>onNodeClick(e,node)}
+                  onDoubleClick={e=>onProjDblClick(e,node)}
+                  onMouseEnter={()=>setHoverId(node.id)} onMouseLeave={()=>setHoverId(null)}
+                  title="单击查看详情 · 双击进入项目 · Ctrl+单击进入分析模式">
+                  <div className="wt-proj-inner">
+                    <span className="wt-proj-expand" onClick={e=>{e.stopPropagation();setExpanded(p=>{const s=new Set(p);s.has(node.id)?s.delete(node.id):s.add(node.id);return s;})}}>{isExp?"▾":"▸"}</span>
+                    <div style={{minWidth:0}}>
+                      <strong className="wt-proj-name">{node.label}</strong>
+                      <span className="wt-proj-sub">{node.sub}</span>
+                    </div>
+                  </div>
+                  {!isExp && leafCt > 0 && <span className="wt-leaf-count">{leafCt}</span>}
+                  {node.navId && (
+                    <button className="wt-nav-btn" title="进入项目"
+                      onClick={e => { e.stopPropagation(); setSelectedProject(node.navId!); setActiveView("projects"); }}>↗</button>
+                  )}
+                </div>
+              );
+            }
+
+            const leafStyle:{[k:string]:{bg:string;border:string;text:string}}={
+              insight:{bg:"rgba(124,58,237,0.12)",border:"rgba(124,58,237,0.32)",text:"#6d28d9"},
+              claim:{bg:"rgba(217,119,6,0.12)",border:"rgba(217,119,6,0.32)",text:"#92400e"},
+              evidence:{bg:"rgba(22,163,74,0.12)",border:"rgba(22,163,74,0.32)",text:"#166534"},
+            };
+            const ls=leafStyle[node.type]??leafStyle.claim;
+            // In group mode: use grouped zone position
+            const groupedPos = getGroupedLeafPos(node);
+            // posOvr overrides grouped position — this is what makes dragging work in organize mode
+            const userDragged = !!posOvr[node.id];
+            const displayPos = (userDragged ? posOvr[node.id] : groupedPos) ?? pos;
+            const isGrouped = !!groupedPos && !userDragged;
+            return (
+              <div key={node.id} className={`wt-node wt-leaf-node ${isHov?"hov":""} ${inSearch?"wt-search-hit":""} ${isGrouped?"wt-leaf-grouped":""}`}
+                style={{
+                  left:displayPos.x, top:displayPos.y,
+                  animationDelay:delay,
+                  background:ls.bg, border:`1px solid ${ls.border}`,
+                  // Smooth transition to/from grouped positions
+                  transition: isGrouped
+                    ? "left 0.62s cubic-bezier(0.34,1.56,0.64,1), top 0.62s cubic-bezier(0.34,1.56,0.64,1)"
+                    : "left 0.5s ease, top 0.5s ease",
+                  zIndex: isGrouped ? 8 : 4,
+                  boxShadow: isGrouped ? `0 3px 14px rgba(0,0,0,0.12)` : undefined,
+                }}
+                onPointerDown={e=>onNodeDown(e,node.id)} onClick={e=>onNodeClick(e,node)}
+                onMouseEnter={()=>setHoverId(node.id)} onMouseLeave={()=>setHoverId(null)}
+                title={`点击前往项目查看\n${node.label}`}>
+                <span className="wt-leaf-label" style={{color:ls.text}}>{node.label}</span>
+              </div>
+            );
+          })}
+
+          {/* Empty */}
+          {allProjects.length===0&&<div style={{position:"absolute",left:WCX,top:WCY+100,transform:"translateX(-50%)",textAlign:"center",color:"var(--text-muted)",fontSize:14,fontWeight:600}}>创建第一个研究项目，世界树开始生长 🌱</div>}
+        </div>
+
+        {/* ── Minimap ── */}
+        <WTMinimap nodes={visibleNodes} getPos={getPos} WW={WW} WH={WH} pan={pan} zoom={zoom} setPan={setPan} containerRef={containerRef}/>
+
+        {/* ── Legend ── */}
+        {showLegend&&(
+          <div className="wt-legend">
+            {focalId ? (
+              <>
+                <div className="wt-legend-title">分析模式图例</div>
+                {[
+                  { c:"#6366f1", l:"节点大小 = 内容相似度", desc:"需求/问题/场景重叠" },
+                  { c:"#0ea5e9", l:"距离远近 = 业务关联度", desc:"资源/依赖/客户关联" },
+                  { c:"#10b981", l:"连线粗细 = 证据充分度", desc:"文档/任务/观点共享" },
+                ].map(({c,l,desc})=>(
+                  <div key={l} style={{display:"flex",alignItems:"flex-start",gap:6,fontSize:10.5,marginBottom:3}}>
+                    <span style={{width:8,height:8,borderRadius:2,background:c,flexShrink:0,display:"inline-block",marginTop:2}}/>
+                    <div><div style={{color:"var(--text-secondary)",fontWeight:700}}>{l}</div><div style={{color:"var(--text-muted)",fontSize:9.5}}>{desc}</div></div>
+                  </div>
+                ))}
+                <div style={{borderTop:"1px solid var(--border)",marginTop:6,paddingTop:5,fontSize:10,color:"var(--text-muted)",lineHeight:1.7}}>
+                  单击项目 → 切换分析基点<br/>再次单击 → 退出分析模式
+                </div>
+              </>
+            ) : (
+              <>
+                {[{c:NC.root,l:"根节点"},{c:NC.collection,l:"主题夹"},{c:NC.project,l:"研究项目"},{c:NC.insight,l:"洞察"},{c:NC.claim,l:"观点"},{c:NC.evidence,l:"证据"}].map(({c,l})=>(
+                  <div key={l} style={{display:"flex",alignItems:"center",gap:5,fontSize:10.5}}>
+                    <span style={{width:8,height:8,borderRadius:"50%",background:c,flexShrink:0,display:"inline-block"}}/>
+                    <span style={{color:"var(--text-secondary)"}}>{l}</span>
+                  </div>
+                ))}
+                <div style={{borderTop:"1px solid var(--border)",marginTop:4,paddingTop:4,fontSize:10,color:"var(--text-muted)",lineHeight:1.6}}>
+                  单击项目进入分析模式<br/>拖动移动 · 布局已保存
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── Analysis panel (focal mode) ── */}
+        {focalId && (() => {
+          const focalProj = allProjects.find(p => p.id === focalId);
+          if (!focalProj) return null;
+          const rels = relationMap[focalId] ?? {};
+          // Sort other projects by business score (distance relevance)
+          const relatedProjects = allProjects
+            .filter(p => p.id !== focalId)
+            .map(p => ({
+              p,
+              sim: getRelDim(focalId, p.id, "similarity"),
+              biz: getRelDim(focalId, p.id, "business"),
+              ev:  getRelDim(focalId, p.id, "evidence"),
+              total: getRelStrength(focalId, p.id),
+            }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 5);
+          const topRelated = relatedProjects.slice(0, 3); // for AI prompt
+          return (
+            <div className="wt-gravity-bar"
+              style={panelPos
+                ? { left: panelPos.left, top: panelPos.top, right: "auto", transform: "none" }
+                : { right: 14, top: 14, left: "auto", transform: "none" }}
+              onPointerDown={e => {
+                if ((e.target as HTMLElement).closest('button,input,select,a')) { e.stopPropagation(); return; }
+                e.stopPropagation();
+                const el = e.currentTarget as HTMLElement;
+                el.setPointerCapture(e.pointerId);
+                // Capture actual pixel position relative to parent on first drag
+                const rect = el.getBoundingClientRect();
+                const parentRect = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect() ?? rect;
+                const ox = rect.left - parentRect.left;
+                const oy = rect.top  - parentRect.top;
+                panelDragRef.current = { sx:e.clientX, sy:e.clientY, ox, oy };
+                setPanelPos({ left: ox, top: oy }); // immediately switch to left/top mode
+              }}
+              onPointerMove={e => {
+                if (!panelDragRef.current) return;
+                setPanelPos({
+                  left: panelDragRef.current.ox + (e.clientX - panelDragRef.current.sx),
+                  top:  panelDragRef.current.oy + (e.clientY - panelDragRef.current.sy),
+                });
+              }}
+              onPointerUp={() => { panelDragRef.current = null; }}
+            >
+              {/* Header — drag handle area */}
+              <div className="wt-gravity-title" style={{ cursor:"grab" }}>
+                <span className="wt-gravity-focal-dot" />
+                <div style={{ flex:1, minWidth:0 }}>
+                  <strong style={{ display:"block", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontSize:12 }}>
+                    「{focalProj.name.slice(0, 20)}{focalProj.name.length > 20 ? "…" : ""}」
+                  </strong>
+                  <span style={{ fontSize:9.5, color:"var(--text-muted)", fontWeight:500 }}>
+                    分析基点 · {allSources.filter(s=>focalProj.sourceIds.includes(s.id)).length} 资料 · {allClaims.filter(c=>c.projectId===focalProj.id).length} 观点
+                  </span>
+                </div>
+                <button className="wt-gravity-close"
+                  onClick={() => { setFocalId(null); setAiRelNote(null); setAiStreamText(""); }}>✕</button>
+              </div>
+
+              {/* Related projects — name + 3 colored score bars + nav */}
+              <div className="wt-rel-list">
+                {/* Column headers with full descriptive labels */}
+                <div style={{ display:"flex", alignItems:"center", gap:7, fontSize:9, color:"var(--text-muted)", fontWeight:700, padding:"0 2px" }}>
+                  <span style={{ flex:1 }}>关联项目（单击切换基点）</span>
+                  <div className="wt-bar-col-headers">
+                    <span style={{ color:"#6366f1" }} title="内容相似程度：需求、问题、客户场景等重叠度">内容相似</span>
+                    <span style={{ color:"#0ea5e9" }} title="业务关联程度：资源共用、交付依赖、客户关联等直接程度">业务关联</span>
+                    <span style={{ color:"#10b981" }} title="关联证据可信度：文档、任务、观点等共同线索的充分程度">关联证据</span>
+                  </div>
+                  <span style={{ width:36 }}/>
+                </div>
+
+                {relatedProjects.length === 0 && (
+                  <span style={{ fontSize:11, color:"var(--text-muted)", fontStyle:"italic", padding:"4px 0" }}>
+                    积累更多资料后可发现关联
+                  </span>
+                )}
+                {relatedProjects.map(({ p, sim, biz, ev }) => {
+                  const sp = Math.round(sim*100), bp = Math.round(biz*100), ep = Math.round(ev*100);
+                  return (
+                    <div key={p.id} className="wt-rel-row"
+                      title={`单击 → 切换为分析基点\n${p.name}`}
+                      onClick={() => { setFocalId(p.id); setAiRelNote(null); setAiStreamText(""); }}>
+                      <span className="wt-rel-name">{p.name.slice(0, 13)}{p.name.length > 13 ? "…" : ""}</span>
+                      <div className="wt-3d-bars">
+                        <div className="wt-bar-row">
+                          <div className="wt-bar-wrap" title={`内容相似程度 ${sp}%`}>
+                            <div className="wt-bar-fill" style={{width:`${sp}%`,background:"#6366f1"}}/>
+                          </div>
+                          <span className="wt-bar-pct" style={{color:"#6366f1"}}>{sp}%</span>
+                        </div>
+                        <div className="wt-bar-row">
+                          <div className="wt-bar-wrap" title={`业务关联程度 ${bp}%`}>
+                            <div className="wt-bar-fill" style={{width:`${bp}%`,background:"#0ea5e9"}}/>
+                          </div>
+                          <span className="wt-bar-pct" style={{color:"#0ea5e9"}}>{bp}%</span>
+                        </div>
+                        <div className="wt-bar-row">
+                          <div className="wt-bar-wrap" title={`关联证据可信度 ${ep}%`}>
+                            <div className="wt-bar-fill" style={{width:`${ep}%`,background:"#10b981"}}/>
+                          </div>
+                          <span className="wt-bar-pct" style={{color:"#10b981"}}>{ep}%</span>
+                        </div>
+                      </div>
+                      {/* ↗ button — navigate to project workspace */}
+                      <button className="wt-rel-nav" title={`进入「${p.name}」项目工作区`}
+                        onClick={e=>{e.stopPropagation();setSelectedProject(p.id);setActiveView("projects");}}>
+                        进入
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* AI Agent analysis controls */}
+              <div className="wt-ai-controls">
+                <div className="wt-ai-mode-toggle">
+                  <button className={aiAnalysisMode === "quick" ? "active" : ""} onClick={() => setAiAnalysisMode("quick")}>快速</button>
+                  <button className={aiAnalysisMode === "deep" ? "active" : ""} onClick={() => setAiAnalysisMode("deep")}>深度</button>
+                </div>
+                <button className={`wt-ai-btn ${aiAnalyzing ? "loading" : ""}`}
+                  onClick={async () => {
+                    if (aiAnalyzing) return;
+                    setAiAnalyzing(true); setAiRelNote(null); setAiStreamText("");
+                    try {
+                      const { askAboutSource } = await import("./services/aiService");
+                      const projNames = topRelated.filter(t => t.total > 0.05).map(t => `${t.p.name}(相似${Math.round(t.sim*100)}%·业务${Math.round(t.biz*100)}%)`).join("、");
+                      const focalSrcs = allSources.filter(s => focalProj.sourceIds.includes(s.id)).slice(0,4).map(s => s.title).join("、");
+                      const isDeep = aiAnalysisMode === "deep";
+                      const msg = isDeep
+                        ? `你是一位项目关系分析专家。请对以下内容进行深度分析：\n\n分析基点：「${focalProj.name}」\n核心资料：${focalSrcs || "（暂无）"}\n关联项目：${projNames || "（暂无）"}\n\n请按四个维度各30字内输出：\n【为什么相关】两者在需求、问题或客户场景上的共同点\n【可复用经验】分析基点项目的哪些经验可直接借鉴\n【需关注风险】跨项目关联可能带来的风险或依赖\n【协同机会】如何利用这些关联产生跨项目价值`
+                        : `分析「${focalProj.name}」与关联项目 ${projNames || "（暂无）"} 的最有价值关联，重点说明可复用的经验和需关注的风险，60字内。`;
+                      let dots = 0;
+                      const li = setInterval(() => { dots=(dots+1)%4; setAiStreamText("分析中"+"·".repeat(dots)); }, 400);
+                      const note = await askAboutSource({ question: msg, paragraph: "", sourceTitle: focalProj.name });
+                      clearInterval(li);
+                      setAiStreamText(""); let i = 0;
+                      const rv = setInterval(() => { i+=2; setAiStreamText(note.slice(0,i)); if(i>=note.length){ clearInterval(rv); setAiRelNote(note); setAiStreamText(""); } }, 20);
+                    } catch { setAiStreamText(""); setAiRelNote("AI 暂时不可用，请在设置中配置 DeepSeek API Key"); }
+                    finally { setAiAnalyzing(false); }
+                  }}>
+                  <GhostIcon size={13} />
+                  {aiAnalyzing ? "Agent 分析中…" : "Lumo Agent 分析"}
+                </button>
+              </div>
+
+              {/* Streaming / result */}
+              {(aiStreamText || aiRelNote) && (
+                <div className="wt-ai-note">
+                  {aiStreamText ? (
+                    <span className="wt-ai-stream">{aiStreamText}<span className="wt-ai-cursor" /></span>
+                  ) : aiRelNote ? (
+                    <div className="wt-ai-result">
+                      {aiRelNote
+                        // Strip markdown symbols
+                        .replace(/\*\*(.+?)\*\*/g, '$1')
+                        .replace(/\*(.+?)\*/g, '$1')
+                        .replace(/^#{1,6}\s*/gm, '')
+                        .split(/\n+/)
+                        .filter(l => l.trim())
+                        .map((raw, i) => {
+                          const line = raw.trim();
+
+                          // 【Tag】content sections
+                          const tag = line.match(/^【(.+?)】(.*)$/);
+                          if (tag) return (
+                            <div key={i} className="wt-ai-section">
+                              <span className="wt-ai-section-tag">{tag[1]}</span>
+                              {tag[2].trim() && <span className="wt-ai-section-body">{tag[2].trim()}</span>}
+                            </div>
+                          );
+
+                          // Bullet points (-, •, ·, ▸)
+                          const bullet = line.match(/^[-•·▸▪]\s+(.+)$/);
+                          if (bullet) return (
+                            <div key={i} className="wt-ai-bullet">
+                              <span className="wt-ai-bullet-dot">▸</span>
+                              <span>{bullet[1]}</span>
+                            </div>
+                          );
+
+                          // Numbered items
+                          const numbered = line.match(/^(\d+)[.、]\s*(.+)$/);
+                          if (numbered) return (
+                            <div key={i} className="wt-ai-bullet">
+                              <span className="wt-ai-bullet-num">{numbered[1]}.</span>
+                              <span>{numbered[2]}</span>
+                            </div>
+                          );
+
+                          // Short standalone title line (no punctuation, <18 chars → treat as section heading)
+                          if (line.length <= 18 && !/[，。：:？！,.!?]/.test(line)) return (
+                            <div key={i} className="wt-ai-heading">{line}</div>
+                          );
+
+                          // Regular paragraph
+                          return <p key={i} className="wt-ai-para">{line}</p>;
+                        })}
+                    </div>
+                  ) : null}
+                  <button className="wt-ai-clear" onClick={() => { setAiRelNote(null); setAiStreamText(""); }}>✕</button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+        {/* Link banner */}
+        {linkMode&&<div className="wt-link-banner">🔗 {linkSrc?"再点击目标节点完成关联":"点击起点节点"}</div>}
+
+        {/* Corner zoom */}
+        <div className="wt-corner-controls">
+          <button className="wt-ctrl-sm" onClick={()=>zoomAround(1.2)}>＋</button>
+          <button className="wt-ctrl-sm" onClick={()=>zoomAround(0.83)}>－</button>
+        </div>
+      </div>
+
+      {/* ── Relationship type dialog ── */}
+      {pendingEdge&&(
+        <div style={{position:"fixed",inset:0,zIndex:900,background:"rgba(0,0,0,0.4)",backdropFilter:"blur(6px)",display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setPendingEdge(null)}>
+          <div style={{background:"var(--surface-strong)",borderRadius:20,padding:"24px 28px",width:320,boxShadow:"0 32px 80px rgba(0,0,0,0.28)"}} onClick={e=>e.stopPropagation()}>
+            <h3 style={{margin:"0 0 6px",fontSize:16,fontWeight:800,color:"var(--text-primary)"}}>这条关联代表什么关系？</h3>
+            <p style={{margin:"0 0 18px",fontSize:13,color:"var(--text-muted)"}}>选择关系类型，帮助你理解知识之间的连接</p>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
+              {REL_TYPES.map(rt=>(
+                <button key={rt.id} onClick={()=>{setUserEdges(v=>[...v,{id:`ue-${Date.now()}`,from:pendingEdge.from,to:pendingEdge.to,rel:rt.id}]);setPendingEdge(null);}}
+                  style={{padding:"10px 14px",borderRadius:12,border:`2px solid ${rt.color}`,background:`color-mix(in srgb, ${rt.color} 10%, var(--surface-strong))`,color:rt.color,fontSize:14,fontWeight:700,cursor:"pointer",transition:"all 0.13s"}}>
+                  {rt.label}
+                </button>
+              ))}
+            </div>
+            <button onClick={()=>setPendingEdge(null)} style={{marginTop:14,width:"100%",padding:"8px",borderRadius:10,border:"1px solid var(--border)",background:"transparent",color:"var(--text-muted)",fontSize:13,cursor:"pointer"}}>取消</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Project info popup — single-click shows brief stats, double-click navigates ── */}
+      {projInfoId && !focalId && (() => {
+        const proj = allProjects.find(p => p.id === projInfoId);
+        if (!proj) return null;
+        const projPos = getPos(projInfoId);
+        const sc = allSources.filter(s => proj.sourceIds.includes(s.id)).length;
+        const cl = allClaims.filter(c => c.projectId === projInfoId).length;
+        const ev = allEvidence.filter(e => e.projectId === projInfoId).length;
+        const ins = allInsights.filter(i => i.projectId === projInfoId).length;
+        const collName = allCollections.find(c => c.sourceIds.some(sid => proj.sourceIds.includes(sid)))?.name ?? "";
+        // Calculate screen position from canvas coordinates
+        const screenX = projPos.x * zoom + pan.x;
+        const screenY = projPos.y * zoom + pan.y;
+        return (
+          <div className="wt-proj-popup" style={{ left: screenX, top: screenY - 8 }}>
+            <div className="wt-proj-popup-name">{proj.name}</div>
+            {collName && <div className="wt-proj-popup-coll">📁 {collName}</div>}
+            {proj.goal && <div className="wt-proj-popup-goal">{proj.goal.slice(0, 60)}{proj.goal.length > 60 ? "…" : ""}</div>}
+            <div className="wt-proj-popup-stats">
+              <span>📄 {sc} 资料</span>
+              <span>💡 {cl} 观点</span>
+              <span>🔍 {ev} 证据</span>
+              <span>✨ {ins} 洞察</span>
+            </div>
+            <div className="wt-proj-popup-actions">
+              <button onClick={() => { setFocalId(projInfoId); setProjInfoId(null); setPanelPos(null); }}>
+                ⊛ 分析关联
+              </button>
+              <button onClick={() => { setSelectedProject(projInfoId); setActiveView("projects"); setProjInfoId(null); }}>
+                进入项目 ↗
+              </button>
+            </div>
+            <div className="wt-proj-popup-hint">双击节点直接进入 · Ctrl+点击进分析模式</div>
+          </div>
+        );
+      })()}
+
+      {/* ── Leaf node full-content popup ── */}
+      {leafInfoId && (() => {
+        const leafNode = nodes.find(n => n.id === leafInfoId);
+        if (!leafNode) return null;
+        const leafPos = getPos(leafInfoId);
+        const screenX = leafPos.x * zoom + pan.x;
+        const screenY = leafPos.y * zoom + pan.y;
+        // Find full content from store
+        const fullInsight = allInsights.find(i => i.id === leafInfoId);
+        const fullClaim = allClaims.find(c => c.id === leafInfoId);
+        const fullEvidence = allEvidence.find(e => e.id === leafInfoId);
+        const projName = allProjects.find(p => p.id === leafNode.projId)?.name ?? "";
+        const typeCfg = {
+          insight:  { label:"洞察", color:"#7c3aed", icon:"✨" },
+          claim:    { label:"观点", color:"#d97706", icon:"💡" },
+          evidence: { label:"证据", color:"#16a34a", icon:"📎" },
+        }[leafNode.type as "insight"|"claim"|"evidence"] ?? { label:"内容", color:"#6366f1", icon:"·" };
+        const fullText = fullInsight?.title
+          ?? fullClaim?.text
+          ?? fullEvidence?.text
+          ?? leafNode.label;
+        const sourceTitle = fullClaim?.text ? undefined : fullEvidence?.sourceTitle;
+        return (
+          <div className="wt-leaf-popup" style={{ left: screenX, top: screenY - 10 }}
+            onClick={e => e.stopPropagation()}>
+            <div className="wt-leaf-popup-header" style={{ borderColor: typeCfg.color + "44" }}>
+              <span className="wt-leaf-popup-badge" style={{ background: typeCfg.color + "18", color: typeCfg.color, borderColor: typeCfg.color + "30" }}>
+                {typeCfg.icon} {typeCfg.label}
+              </span>
+              {projName && <span className="wt-leaf-popup-proj">📌 {projName.slice(0, 14)}{projName.length > 14 ? "…" : ""}</span>}
+              <button className="wt-leaf-popup-close" onClick={() => setLeafInfoId(null)}>✕</button>
+            </div>
+            <p className="wt-leaf-popup-text">{fullText}</p>
+            {sourceTitle && <div className="wt-leaf-popup-source">出处：{sourceTitle}</div>}
+            {/* Claim confidence if available */}
+            {fullClaim?.confidence && (
+              <div className="wt-leaf-popup-source">置信度：{fullClaim.confidence === "high" ? "高" : fullClaim.confidence === "medium" ? "中" : "低"}</div>
+            )}
+            <button className="wt-leaf-popup-goto" style={{ borderColor: typeCfg.color + "50", color: typeCfg.color }}
+              onClick={() => { if (leafNode.projId) { setSelectedProject(leafNode.projId); setActiveView("projects"); setLeafInfoId(null); } }}>
+              进入项目查看完整内容 →
+            </button>
+          </div>
+        );
+      })()}
+
+      {/* ── Bottom hint bar — explains visual encoding, not in toolbar where it blocks ── */}
+      <div className="wt-bottom-hint">
+        {focalId ? (
+          <>
+            <span className="wt-hint-item"><span className="wt-hint-dot" style={{background:"#6366f1"}}/>节点大小 = 内容相似度</span>
+            <span className="wt-hint-sep">·</span>
+            <span className="wt-hint-item"><span className="wt-hint-dot" style={{background:"#0ea5e9"}}/>距离远近 = 业务关联度</span>
+            <span className="wt-hint-sep">·</span>
+            <span className="wt-hint-item"><span className="wt-hint-dot" style={{background:"#10b981"}}/>连线粗细 = 证据充分度</span>
+            <span className="wt-hint-sep">·</span>
+            <span style={{color:"var(--text-muted)"}}>单击任意项目切换基点</span>
+          </>
+        ) : (
+          <span style={{color:"var(--text-muted)"}}>单击项目节点进入分析模式 · 以项目为中心重构关系网络</span>
+        )}
+      </div>
+
+      {/* Stats bar */}
+      <div className="wt-stats-bar">
+        {[
+          {l:english?"Projects":"研究项目",v:allProjects.length,c:NC.project},
+          {l:english?"Collections":"主题夹",v:allCollections.length,c:NC.collection},
+          {l:english?"Sources":"收藏资料",v:allSources.length,c:NC.source},
+          {l:english?"Claims":"观点",v:allClaims.length,c:NC.claim},
+          {l:english?"Evidence":"证据",v:allEvidence.length,c:NC.evidence},
+          {l:english?"Insights":"洞察",v:allInsights.length,c:NC.insight},
+          {l:"自定义关联",v:userEdges.length,c:"var(--accent)"},
+        ].map(s=>(
+          <div key={s.l} className="wt-stat-chip">
+            <span style={{width:7,height:7,borderRadius:"50%",background:s.c,flexShrink:0,display:"inline-block"}}/>
+            <span>{s.l}</span>
+            <strong>{s.v}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Minimap component ─────────────────────────────────────────────────────────
+function WTMinimap({ nodes, getPos, WW, WH, pan, zoom, setPan, containerRef }: {
+  nodes: Array<{ id:string; type:string; color:string; bx:number; by:number }>;
+  getPos: (id:string) => {x:number;y:number};
+  WW:number; WH:number; pan:{x:number;y:number}; zoom:number;
+  setPan:(p:{x:number;y:number})=>void;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const MW=140, MH=90;
+  const sx=MW/WW, sy=MH/WH;
+  const mmRef = useRef<HTMLDivElement>(null);
+
+  const vpW=containerRef.current?containerRef.current.clientWidth/zoom:400;
+  const vpH=containerRef.current?containerRef.current.clientHeight/zoom:300;
+  const vpX=-pan.x/zoom, vpY=-pan.y/zoom;
+
+  const onMMClick=(e:React.MouseEvent)=>{
+    const r=mmRef.current!.getBoundingClientRect();
+    const wx=(e.clientX-r.left)/sx, wy=(e.clientY-r.top)/sy;
+    const cw=containerRef.current?.clientWidth??400, ch=containerRef.current?.clientHeight??300;
+    setPan({x:cw/2-wx*zoom, y:ch/2-wy*zoom});
+  };
+
+  return (
+    <div ref={mmRef} className="wt-minimap" onClick={onMMClick}>
+      <svg width={MW} height={MH} style={{display:"block"}}>
+        {nodes.map(n=>{
+          const p=getPos(n.id);
+          return <circle key={n.id} cx={p.x*sx} cy={p.y*sy} r={n.type==="root"?4:n.type==="project"?3:1.5} fill={n.color} opacity={n.type==="root"?1:n.type==="project"?0.85:0.55}/>;
+        })}
+        <rect x={vpX*sx} y={vpY*sy} width={vpW*sx} height={vpH*sy} fill="none" stroke="var(--accent)" strokeWidth="1.5" rx="2" opacity="0.8"/>
+      </svg>
+    </div>
+  );
+}
+
+
 function ProjectWorkspace({ projectId }: { projectId: string }) {
   const project = useAppStore((s) => s.projects.find((item) => item.id === projectId));
   const language = useAppStore((s) => s.language);
@@ -5792,7 +7405,19 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
   const rollbackToCheckpoint = useAppStore((s) => s.rollbackToCheckpoint);
   const timelineRaw = useAppStore((s) => s.projectTimeline[projectId]);
   const timeline = useMemo(() => timelineRaw ?? [], [timelineRaw]);
-  const [tab, setTab] = useState("graph");
+  const [tab, setTab] = useState<string>(() => {
+    // If another page requested a specific tab (e.g. "worldtree"), use it once then clear
+    const initial = _pendingProjectTab ?? "graph";
+    _pendingProjectTab = null;
+    return initial;
+  });
+  // Also handle case where component is already mounted when a pending tab is set
+  useEffect(() => {
+    if (_pendingProjectTab) {
+      setTab(_pendingProjectTab);
+      _pendingProjectTab = null;
+    }
+  });
   const [checkpointNote, setCheckpointNote] = useState("");
   const [addingCheckpoint, setAddingCheckpoint] = useState(false);
   const [rollbackTarget, setRollbackTarget] = useState<NonNullable<import("./types").TimelineEntry["snapshot"]> | null>(null);
@@ -5815,8 +7440,8 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
   }, [sources, allClaims, allEvidence, allInsights, allDeliverables, timeline, projectId, project]);
   const english = isEn(language);
   const tabLabels = english
-    ? [["overview", "Overview"], ["graph", "Knowledge Graph"], ["sources", "Sources"], ["claims", "Claims"], ["evidence", "Evidence"], ["insights", "Insights"], ["matrix", "Charts & Tables"], ["inspiration", "Inspiration"], ["timeline", "Timeline"]]
-    : [["overview", "概览"], ["graph", "知识图谱"], ["sources", "资料"], ["claims", "观点"], ["evidence", "证据"], ["insights", "洞察"], ["matrix", "图表"], ["inspiration", "灵感"], ["timeline", "时间线"]];
+    ? [["overview", "Overview"], ["graph", "Knowledge Graph"], ["sources", "Sources"], ["claims", "Claims"], ["evidence", "Evidence"], ["insights", "Insights"], ["matrix", "Charts & Tables"], ["inspiration", "Inspiration"], ["timeline", "Timeline"], ["worldtree", "🌳 World Tree"]]
+    : [["overview", "概览"], ["graph", "知识图谱"], ["sources", "资料"], ["claims", "观点"], ["evidence", "证据"], ["insights", "洞察"], ["matrix", "图表"], ["inspiration", "灵感"], ["timeline", "时间线"], ["worldtree", "🌳 世界树"]];
   const statsLabels = english ? ["Sources", "Claims", "Evidence", "Insights", "Deliverables"] : ["资料", "观点", "证据", "洞察", "成果"];
   const isEmptyProject = sources.length === 0 && claims.length === 0 && evidence.length === 0 && insights.length === 0 && deliverables.length === 0;
   if (!project) return null;
@@ -5877,7 +7502,11 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
           </div>
         );
       })()}
-      <div className="tabs">{tabLabels.map(([id, label]) => <button key={id} className={tab === id ? "active" : ""} onClick={() => setTab(id)}>{label}</button>)}</div>
+      <div className="tabs">
+        {tabLabels.map(([id, label]) => (
+          <button key={id} className={tab === id ? "active" : ""} onClick={() => setTab(id)}>{label}</button>
+        ))}
+      </div>
       {tab === "overview" && <div className="overview-grid"><MiniList title={english ? "Key Questions" : "关键问题"} items={project.keyQuestions} /><MiniList title={english ? "Core Sources" : "核心资料"} items={sources.map((s) => s.title)} /><MiniList title={english ? "Key Claims" : "关键观点"} items={claims.map((c) => c.text)} /><MiniList title={english ? "Key Evidence" : "关键证据"} items={evidence.map((e) => e.text)} /><MiniList title={english ? "Key Insights" : "关键洞察"} items={insights.map((i) => i.title)} /><MiniList title={english ? "Next Steps" : "下一步建议"} items={english ? ["Generate a PRD", "Validate high-confidence claims", "Export the evidence list"] : ["生成 PRD", "验证高置信观点", "导出证据列表"]} /></div>}
       {tab === "graph" && <OntologyMap project={project} sources={sources} notes={notes} claims={claims} evidence={evidence} insights={insights} deliverables={deliverables} language={language} />}
       {tab === "sources" && <SourceList sources={sources.map((source) => source.id)} />}
@@ -6138,73 +7767,26 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
           manual_checkpoint:   { color:"#111827", label:"断点" },
         };
 
-        // ── Rollback helpers ──────────────────────────────────────────────────
+        // ── Rollback: VISUAL ONLY — no data is changed ───────────────────────
+        // derivedTimeline[0] = newest, derivedTimeline[N-1] = oldest
+        // selectedIndex k → entries 0..k-1 (newer) grayed, k highlighted, k+1..N-1 normal
 
-        // Snapshot of current project state (for undo)
-        const captureCurrentSnapshot = (): NonNullable<import("./types").TimelineEntry["snapshot"]> => ({
-          sourceCount: sources.length, claimCount: claims.length,
-          evidenceCount: evidence.length, insightCount: insights.length,
-          sourceIds: sources.map(s => s.id), claimIds: claims.map(c => c.id),
-          evidenceIds: evidence.map(e => e.id), insightIds: insights.map(i => i.id),
-        });
-
-        // Compute what the project state should be at timeline index `targetIdx`.
-        // derivedTimeline[0] = newest, derivedTimeline[N-1] = oldest.
-        // Rollback to targetIdx = keep entries at targetIdx..N-1, remove 0..targetIdx-1.
-        const computeSnapshotAt = (targetIdx: number): NonNullable<import("./types").TimelineEntry["snapshot"]> => {
-          // Use stored snapshot for manual_checkpoint entries when available
-          const entry = derivedTimeline[targetIdx];
-          if (entry?.snapshot && 'sourceIds' in entry.snapshot) {
-            return entry.snapshot as NonNullable<import("./types").TimelineEntry["snapshot"]>;
-          }
-          // Otherwise compute by subtracting entities introduced in newer entries (0..targetIdx-1)
-          const removeSrc = new Set<string>();
-          const removeCl  = new Set<string>();
-          const removeEv  = new Set<string>();
-          const removeIn  = new Set<string>();
-          for (const e of derivedTimeline.slice(0, targetIdx)) {
-            if (e.id.startsWith("src-")) removeSrc.add(e.id.slice(4));
-            else if (e.id.startsWith("cl-")) removeCl.add(e.id.slice(3));
-            else if (e.id.startsWith("ev-")) removeEv.add(e.id.slice(3));
-            else if (e.id.startsWith("in-")) removeIn.add(e.id.slice(3));
-          }
-          const srcIds = sources.filter(s => !removeSrc.has(s.id)).map(s => s.id);
-          const clIds  = claims.filter(c => !removeCl.has(c.id)).map(c => c.id);
-          const evIds  = evidence.filter(e => !removeEv.has(e.id)).map(e => e.id);
-          const inIds  = insights.filter(i => !removeIn.has(i.id)).map(i => i.id);
-          return { sourceCount: srcIds.length, claimCount: clIds.length, evidenceCount: evIds.length, insightCount: inIds.length, sourceIds: srcIds, claimIds: clIds, evidenceIds: evIds, insightIds: inIds };
-        };
-
-        // Perform rollback: save undo snapshot, apply, update UI
+        // Click any step → set that as visual rollback point (jump to any step directly)
         const doRollbackTo = (entryId: string, idx: number) => {
-          const prev = captureCurrentSnapshot();
-          const next = computeSnapshotAt(idx);
-          setUndoSnapshots(s => [...s, prev]);
-          rollbackToCheckpoint(projectId, next);
           setSelectedEntryId(entryId);
-          notify(`已回朔至第 ${idx + 1} 步，可点「撤回」还原`);
+          notify(`已回朔至第 ${idx + 1} 步 — 当前步骤仍保留，点「回到当前状态」恢复`);
         };
 
-        // Undo last rollback
-        const doUndo = () => {
-          if (undoSnapshots.length === 0) return;
-          const prev = undoSnapshots[undoSnapshots.length - 1];
-          setUndoSnapshots(s => s.slice(0, -1));
-          rollbackToCheckpoint(projectId, prev);
-          // Move selection one step forward (less rolled-back)
-          const newIdx = selectedIndex > 0 ? selectedIndex - 1 : -1;
-          setSelectedEntryId(newIdx >= 0 ? derivedTimeline[newIdx]?.id ?? null : null);
-          notify("已撤回上一步回朔");
+        // "撤回" on any grayed entry: jump directly to THAT entry (not step-by-step)
+        // i.e. move the rollback point forward to this specific entry
+        const doUndoTo = (entryId: string) => {
+          setSelectedEntryId(entryId);
         };
 
-        // Restore to original (before any rollbacks)
+        // "回到当前状态" — clear visual rollback, show everything
         const doRestore = () => {
-          if (undoSnapshots.length > 0) {
-            rollbackToCheckpoint(projectId, undoSnapshots[0]);
-            setUndoSnapshots([]);
-            notify("已复原至最初版本");
-          }
           setSelectedEntryId(null);
+          notify("已回到当前最新状态");
         };
 
         // ── Visual state ─────────────────────────────────────────────────────
@@ -6226,10 +7808,11 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
                 )}
               </div>
               <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                {undoSnapshots.length > 0 && (
+                {/* Show "回到当前状态" when rolled back OR when undo stack has history */}
+                {(undoSnapshots.length > 0 || isRolledBack) && (
                   <button type="button" onClick={doRestore}
                     style={{ padding:"5px 13px", borderRadius:99, border:"1.5px solid #fca5a5", background:"#fff5f5", color:"#dc2626", fontSize:11.5, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
-                    ↺ 复原
+                    ↺ 回到当前状态
                   </button>
                 )}
                 <button type="button" onClick={() => setAddingCheckpoint(v => !v)}
@@ -6285,9 +7868,14 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
                   const isDark = isCheckpoint;
 
                   return (
-                    <div key={entry.id} style={{ position:"relative", marginBottom:10, opacity: isGrayed ? 0.28 : 1, transition:"opacity 0.2s", pointerEvents: isGrayed ? "none" : "auto" }}>
-
-                      {/* Dot */}
+                    <div key={entry.id} style={{ position:"relative", marginBottom:10, opacity: isGrayed ? 0.32 : 1, transition:"opacity 0.2s" }}>
+                      {/* Grayed entries: show "撤回到此" button to jump directly */}
+                      {isGrayed && (
+                        <button type="button" onClick={() => doUndoTo(entry.id)}
+                          style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", zIndex:5, fontSize:10, padding:"2px 8px", borderRadius:99, border:"1.5px solid #c4b5fd", background:"rgba(245,243,255,0.92)", color:"#7c3aed", fontWeight:600, cursor:"pointer", backdropFilter:"blur(4px)" }}>
+                          ↩ 撤回到此
+                        </button>
+                      )}
                       <div style={{
                         position:"absolute", left:-30, top:13,
                         width:14, height:14, borderRadius:"50%",
@@ -6349,7 +7937,7 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
                                 <span style={{ width:6, height:6, borderRadius:"50%", background:"#7c3aed", display:"inline-block" }} />
                                 已回朔至此
                               </span>
-                              <button type="button" onClick={doUndo}
+                              <button type="button" onClick={() => doUndoTo(entry.id)}
                                 style={{ fontSize:10.5, padding:"2px 10px", borderRadius:99, border:"1.5px solid #a78bfa", background:"#f5f3ff", color:"#7c3aed", fontWeight:700, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:3 }}>
                                 ↩ 撤回
                               </button>
@@ -6372,6 +7960,7 @@ function ProjectWorkspace({ projectId }: { projectId: string }) {
           </div>
         );
       })()}
+      {tab === "worldtree" && <WorldTreeView language={language} />}
     </div>
   );
 }

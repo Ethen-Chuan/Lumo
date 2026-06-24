@@ -43,6 +43,43 @@ import {
   generateMockSummary,
 } from "../utils/mockAi";
 
+// ── Context-aware local AI reason (no API key required) ───────────────────
+function inferAiReason(title: string, url: string, type: string, purpose: string): string {
+  const t = title.toLowerCase();
+  const domain = (() => { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
+  if (t.includes("duolingo") || t.includes("streak") || t.includes("habit") || t.includes("留存") || t.includes("retention"))
+    return "涉及用户留存与习惯养成机制，建议提炼核心激励设计作为项目观点。";
+  if (t.includes("product") || t.includes("产品") || t.includes("feature") || t.includes("功能"))
+    return "产品功能相关资料，建议精读后提炼用户需求与设计决策观点。";
+  if (t.includes("growth") || t.includes("增长") || t.includes("viral") || t.includes("acquisition"))
+    return "增长策略相关内容，建议标注为项目素材，提炼核心驱动因素。";
+  if (t.includes("ai") || t.includes("gpt") || t.includes("llm") || t.includes("模型") || t.includes("intelligence") || t.includes("agent"))
+    return "AI 技术/产品内容，建议提炼功能特性和应用场景观点。";
+  if (t.includes("market") || t.includes("竞品") || t.includes("competitor") || t.includes("analysis") || t.includes("分析"))
+    return "竞品/市场资料，建议加入竞品分析项目并提炼差异化要点。";
+  if (t.includes("case") || t.includes("案例") || t.includes("study") || t.includes("研究"))
+    return "案例研究类资料，建议精读后用于支撑项目核心结论。";
+  if (t.includes("report") || t.includes("报告") || t.includes("survey") || t.includes("data") || t.includes("数据"))
+    return "数据报告，建议提炼关键指标和趋势数据作为项目证据。";
+  if (t.includes("startup") || t.includes("创业") || t.includes("founder") || t.includes("business") || t.includes("商业"))
+    return "商业/创业相关，建议提炼商业模式和关键决策逻辑。";
+  if (t.includes("user") || t.includes("用户") || t.includes("customer") || t.includes("客户") || t.includes("ux"))
+    return "用户研究相关，建议提炼用户痛点和核心需求洞察。";
+  if (t.includes("notion") || t.includes("linear") || t.includes("figma") || t.includes("slack") || t.includes("stripe"))
+    return "知名产品案例，建议提炼产品决策逻辑作为竞品参考。";
+  if (domain.includes("medium") || domain.includes("substack") || domain.includes("blog"))
+    return "博客/专栏文章，建议精读并高亮关键段落转为研究观点。";
+  if (domain.includes("github")) return "技术资料，建议归档到技术主题夹，提炼核心实现方案。";
+  if (domain.includes("youtube") || domain.includes("youtu")) return "视频资料，建议标记关键时间点，浏览后加入相关项目。";
+  if (domain.includes("twitter") || domain.includes("x.com") || domain.includes("linkedin"))
+    return "社交内容，略读后提炼有价值的观点归档即可。";
+  if (type === "pdf")   return "PDF 文档，建议精读后提炼核心论点和关键数据。";
+  if (type === "video") return "视频资料，建议标记关键时间点作为参考素材。";
+  if (type === "note")  return "笔记类资料，建议整理后关联到当前活跃项目。";
+  if (purpose === "project_research") return "项目研究素材，建议精读后直接加入当前活跃项目。";
+  return "建议先看摘要，再高亮 1-2 段关键内容加入项目。";
+}
+
 export type ThemeMode = "light" | "dark" | "warm" | "mint";
 export type NavPlacement = "left" | "top" | "right" | "bottom";
 export type AppLanguage = "zh" | "en";
@@ -115,6 +152,7 @@ type AppState = {
   appendToDeliverable: (projectId: string, label: string, text: string, sourceTitle?: string) => void;
   updateInsight: (id: string, patch: { title?: string; content?: string }) => void;
   deleteInsight: (insightId: string) => void;
+  createInsightFromAnnotation: (noteText: string, sourceTitle: string, projectId: string) => void;
   deleteDeliverable: (deliverableId: string) => void;
   deleteProject: (projectId: string) => void;
   addTimelineEntry: (entry: Omit<import("../types").TimelineEntry, "id">) => void;
@@ -269,7 +307,13 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       hasSnapshot: payload.hasSnapshot ?? true,
       snapshotStatus: payload.snapshotStatus ?? "saved",
       summary: generateMockSummary(payload),
-      aiReason: "新收藏的资料。Lumo 建议先判断它是否支持当前项目，再决定精读或归档。",
+      // Context-aware local reason — will be replaced by real AI if key is configured
+      aiReason: inferAiReason(
+        payload.title ?? "",
+        payload.url ?? "",
+        payload.type ?? "article",
+        payload.purpose ?? "later_reading",
+      ),
       readingRecommendation: "先看 AI 摘要，再高亮一段可作为证据的内容。",
       keyPoints: ["新资料已进入收件箱", "可能成为项目素材", "可立即抽取观点"],
       relatedTopics: ["AI Inbox", "Capture", "Project research"],
@@ -299,8 +343,20 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
       )),
       selectedSourceId: source.id,
       activeView: "sources",
-      toast: "资料已保存到资料库，等待 AI 分拣",
+      toast: "资料已保存，AI 正在分析…",
     }));
+
+    // ── Async DeepSeek triage (replaces local reason with real AI judgment) ──
+    if (aiService.hasApiKey()) {
+      const { id: sourceId, title, url, content } = source;
+      aiService.triageSource({
+        title,
+        url,
+        summary: (content?.[0] ?? "").slice(0, 200),
+      }).then(({ triageStatus, aiReason }) => {
+        get().updateSource(sourceId, { triageStatus, aiReason });
+      }).catch(() => { /* silent — local reason stays */ });
+    }
   },
   updateSource: (id, patch) => set((state) => ({ sources: state.sources.map((source) => (source.id === id ? { ...source, ...patch, updatedAt: stamp() } : source)) })),
   archiveSource: (id) => get().updateSource(id, { status: "archived" }),
@@ -726,6 +782,30 @@ export const useAppStore = create<AppState>()(persist((set, get) => ({
     projects: state.projects.map((p) => ({ ...p, insightIds: p.insightIds.filter((id) => id !== insightId) })),
     toast: "洞察已删除",
   })),
+  createInsightFromAnnotation: (noteText, sourceTitle, projectId) => {
+    if (!noteText.trim() || !projectId) return;
+    const newInsight: import("../types").Insight = {
+      id: uid("ins"),
+      title: noteText.length > 60 ? noteText.slice(0, 58) + "…" : noteText,
+      content: `批注来源：《${sourceTitle}》\n\n${noteText}`,
+      type: "learning_summary",
+      priority: "medium",
+      projectId,
+      claimIds: [],
+      evidenceIds: [],
+      suggestedDeliverables: [],
+      createdAt: stamp(),
+    };
+    set((state) => ({
+      insights: [newInsight, ...state.insights],
+      projects: state.projects.map((p) =>
+        p.id === projectId
+          ? { ...p, insightIds: Array.from(new Set([newInsight.id, ...p.insightIds])) }
+          : p
+      ),
+      toast: "批注已保存为洞察 ✨",
+    }));
+  },
   updateDeliverable: (id, content) => set((state) => ({
     deliverables: state.deliverables.map((d) => d.id === id ? { ...d, content } : d),
   })),

@@ -170,7 +170,7 @@ const demoReferences: Record<string, Source["sourceReferences"]> = {
 const localDemoSource = "/media/lumo-research-note.txt";
 
 export const collections: Collection[] = [
-  { id: "c1", name: "跨行业产品研究样例", description: "美妆、教育增长、AI 办公、创作者硬件和平台服务的多元样例。", sourceIds: ["s1", "s2", "s3", "s4", "s5"], tags: ["product", "growth", "ai", "platform"], createdAt: daysAgo(35), updatedAt: daysAgo(1) },
+  { id: "c1", name: "行业案例素材库", description: "美妆、教育增长、AI 办公、创作者硬件和平台服务的多元资料样例。", sourceIds: ["s1", "s2", "s3", "s4", "s5"], tags: ["product", "growth", "ai", "platform"], createdAt: daysAgo(35), updatedAt: daysAgo(1) },
   { id: "c2", name: "AI 与协作工具", description: "Notion、Figma、Stripe、Slack、Linear 等工具型产品样例。", sourceIds: ["s3", "s7", "s8", "s12", "s14"], tags: ["ai", "tools", "workflow"], createdAt: daysAgo(28), updatedAt: daysAgo(2) },
   { id: "c3", name: "增长与消费产品", description: "Duolingo、Spotify、IKEA、Nike、Headspace 的增长和体验样例。", sourceIds: ["s2", "s6", "s9", "s10", "s11"], tags: ["growth", "consumer"], createdAt: daysAgo(25), updatedAt: daysAgo(3) },
   { id: "c4", name: "商业模式与品牌", description: "Shopify、Tesla、Patagonia 等商业机制和品牌信任案例。", sourceIds: ["s13", "s15", "s16"], tags: ["commerce", "brand"], createdAt: daysAgo(12), updatedAt: daysAgo(1) },

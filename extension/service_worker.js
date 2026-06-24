@@ -5,11 +5,28 @@ const KIND_LABEL = {
   video_timestamp: "视频时间点"
 };
 
+// Default Lumo app URL — user can change in popup settings
+const DEFAULT_LUMO_PORT = 5173;
+
+// All URL patterns we try to detect Lumo App on
 const LUMO_URL_PATTERNS = [
+  "http://localhost:5173/*",
+  "http://localhost:5174/*",
+  "http://localhost:5175/*",
+  "http://localhost:5176/*",
+  "http://localhost:5180/*",
   "http://localhost:517*/*",
   "http://localhost:518*/*",
-  "http://127.0.0.1:517*/*"
+  "http://127.0.0.1:517*/*",
+  "http://127.0.0.1:518*/*"
 ];
+
+async function getLumoPort() {
+  try {
+    const { lumoPort } = await chrome.storage.local.get("lumoPort");
+    return lumoPort || DEFAULT_LUMO_PORT;
+  } catch { return DEFAULT_LUMO_PORT; }
+}
 
 async function getActiveTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

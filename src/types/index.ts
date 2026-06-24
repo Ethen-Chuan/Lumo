@@ -79,7 +79,8 @@ export type ActiveView =
   | "import_export"
   | "profile"
   | "community"
-  | "settings";
+  | "settings"
+  | "worldtree";
 
 export interface LumoUserProfile {
   id: string;

@@ -5,12 +5,24 @@
   "version": "0.2.0",
   "permissions": ["activeTab", "tabs", "storage", "downloads", "scripting"],
   "host_permissions": ["<all_urls>"],
+  "icons": {
+    "16":  "icon16.png",
+    "32":  "icon32.png",
+    "48":  "icon48.png",
+    "128": "icon128.png"
+  },
   "background": {
     "service_worker": "service_worker.js"
   },
   "action": {
     "default_title": "收藏到 Lumo",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16":  "icon16.png",
+      "32":  "icon32.png",
+      "48":  "icon48.png",
+      "128": "icon128.png"
+    }
   },
   "commands": {
     "save-link": {
@@ -38,9 +50,17 @@
     },
     {
       "matches": [
+        "http://localhost:5173/*",
+        "http://localhost:5174/*",
+        "http://localhost:5175/*",
+        "http://localhost:5176/*",
+        "http://localhost:5180/*",
         "http://localhost:517*/*",
         "http://localhost:518*/*",
-        "http://127.0.0.1:517*/*"
+        "http://127.0.0.1:517*/*",
+        "http://127.0.0.1:518*/*",
+        "https://*.vercel.app/*",
+        "https://*.netlify.app/*"
       ],
       "js": ["lumo_bridge.js"],
       "run_at": "document_idle"

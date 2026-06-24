@@ -165,3 +165,18 @@ button:active { transform: translateY(0) scale(0.98); }
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* Port setting */
+.port-setting {
+  display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; align-items: center;
+  padding: 9px 12px; background: rgba(241,245,249,0.8);
+  border: 1px solid #e2e8f0; border-radius: 12px;
+}
+.port-setting label { font-size: 11.5px; font-weight: 700; color: #475569; }
+.port-setting input {
+  height: 28px; border: 1.5px solid #cbd5e1; border-radius: 7px;
+  padding: 0 8px; font-size: 12px; font-weight: 700; color: #0f172a;
+  background: #fff; outline: none; width: 70px;
+}
+.port-setting input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.12); }
+.port-hint { grid-column: 1 / -1; font-size: 10.5px; color: #94a3b8; font-weight: 500; }

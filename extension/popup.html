@@ -14,18 +14,38 @@
     <p id="lumo-status" class="lumo-disconnected">○ 检测中…</p>
     <main>
       <section class="actions">
-        <button data-kind="link">保存链接</button>
-        <button data-kind="article_snapshot">文章快照</button>
-        <button data-kind="image_snapshot">网页截图</button>
-        <button data-kind="video_timestamp">视频时间点</button>
+        <button data-kind="link">💾 保存链接</button>
+        <button data-kind="article_snapshot">📄 文章快照</button>
+        <button data-kind="image_snapshot">🖼 网页截图</button>
+        <button data-kind="video_timestamp">▶ 视频时间点</button>
       </section>
       <section class="tools">
-        <button id="sync-lumo" disabled>一键同步到 Lumo</button>
-        <button id="open-lumo">打开 Lumo</button>
+        <button id="sync-lumo" disabled>⟳ 同步到 Lumo</button>
+        <button id="open-lumo">打开 Lumo App</button>
         <button id="export">导出 JSON</button>
         <button id="copy-json">复制 JSON</button>
         <button id="clear">清空</button>
       </section>
+      <!-- Lumo URL setting: supports localhost dev + production -->
+      <div class="port-setting">
+        <label for="lumo-url-mode">连接模式</label>
+        <select id="lumo-url-mode" style="height:28px;border:1.5px solid #cbd5e1;border-radius:7px;padding:0 8px;font-size:12px;font-weight:600;background:#fff;outline:none;">
+          <option value="local">本地开发 (localhost)</option>
+          <option value="online">线上部署 (URL)</option>
+        </select>
+        <span class="port-hint" id="url-hint">Vite 默认端口 5173</span>
+      </div>
+      <div class="port-setting" id="local-port-row">
+        <label for="lumo-port">本地端口</label>
+        <input type="number" id="lumo-port" value="5173" min="1024" max="65535" />
+        <span class="port-hint">终端查看实际端口</span>
+      </div>
+      <div class="port-setting" id="online-url-row" style="display:none">
+        <label for="lumo-online-url">线上地址</label>
+        <input type="text" id="lumo-online-url" placeholder="https://xxx.vercel.app"
+          style="height:28px;border:1.5px solid #cbd5e1;border-radius:7px;padding:0 8px;font-size:11.5px;background:#fff;outline:none;width:160px;" />
+        <span class="port-hint">部署后复制 URL 粘贴</span>
+      </div>
       <p id="status"></p>
       <section id="clips" class="clips"></section>
     </main>

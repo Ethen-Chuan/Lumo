@@ -2,6 +2,60 @@ const statusEl = document.querySelector("#status");
 const clipsEl = document.querySelector("#clips");
 const syncBtn = document.querySelector("#sync-lumo");
 const lumoStatusEl = document.querySelector("#lumo-status");
+const portInput = document.querySelector("#lumo-port");
+const urlModeSelect = document.querySelector("#lumo-url-mode");
+const onlineUrlInput = document.querySelector("#lumo-online-url");
+const localPortRow = document.querySelector("#local-port-row");
+const onlineUrlRow = document.querySelector("#online-url-row");
+
+// Load saved settings
+chrome.storage.local.get(["lumoPort", "lumoUrlMode", "lumoOnlineUrl"]).then(
+  ({ lumoPort = 5173, lumoUrlMode = "local", lumoOnlineUrl = "" }) => {
+    if (portInput) portInput.value = lumoPort;
+    if (urlModeSelect) urlModeSelect.value = lumoUrlMode;
+    if (onlineUrlInput) onlineUrlInput.value = lumoOnlineUrl;
+    applyUrlMode(lumoUrlMode);
+  }
+);
+
+function applyUrlMode(mode) {
+  if (!localPortRow || !onlineUrlRow) return;
+  localPortRow.style.display = mode === "local" ? "" : "none";
+  onlineUrlRow.style.display = mode === "online" ? "" : "none";
+}
+
+urlModeSelect?.addEventListener("change", async () => {
+  const mode = urlModeSelect.value;
+  await chrome.storage.local.set({ lumoUrlMode: mode });
+  applyUrlMode(mode);
+  checkLumoStatus();
+});
+
+portInput?.addEventListener("change", async () => {
+  const port = parseInt(portInput.value, 10);
+  if (port > 1000 && port < 65535) {
+    await chrome.storage.local.set({ lumoPort: port });
+    setStatus(`✓ 端口已更新为 ${port}`);
+    checkLumoStatus();
+  }
+});
+
+onlineUrlInput?.addEventListener("change", async () => {
+  const url = onlineUrlInput.value.trim().replace(/\/$/, "");
+  if (url.startsWith("https://") || url.startsWith("http://")) {
+    await chrome.storage.local.set({ lumoOnlineUrl: url });
+    setStatus(`✓ 线上地址已保存`);
+    checkLumoStatus();
+  }
+});
+
+/** Get the current Lumo URL based on mode */
+async function getLumoUrl() {
+  const { lumoPort = 5173, lumoUrlMode = "local", lumoOnlineUrl = "" } =
+    await chrome.storage.local.get(["lumoPort", "lumoUrlMode", "lumoOnlineUrl"]);
+  if (lumoUrlMode === "online" && lumoOnlineUrl) return lumoOnlineUrl;
+  return `http://localhost:${lumoPort}`;
+}
 
 function setStatus(text, type = "") {
   statusEl.textContent = text;
@@ -27,15 +81,28 @@ function text(value, fallback = "") {
 }
 
 const LUMO_PATTERNS = [
+  "http://localhost:5173/*",
+  "http://localhost:5174/*",
+  "http://localhost:5175/*",
+  "http://localhost:5176/*",
+  "http://localhost:5180/*",
   "http://localhost:517*/*",
   "http://localhost:518*/*",
-  "http://127.0.0.1:517*/*"
+  "http://127.0.0.1:517*/*",
+  "http://127.0.0.1:518*/*"
 ];
 
 async function findLumoTabs() {
   const all = [];
+  // Check localhost patterns
   for (const pattern of LUMO_PATTERNS) {
     try { all.push(...await chrome.tabs.query({ url: pattern })); } catch { /* ignore */ }
+  }
+  // Also check online URL if configured
+  const { lumoUrlMode, lumoOnlineUrl } = await chrome.storage.local.get(["lumoUrlMode", "lumoOnlineUrl"]);
+  if (lumoUrlMode === "online" && lumoOnlineUrl) {
+    try { all.push(...await chrome.tabs.query({ url: lumoOnlineUrl + "/*" })); } catch { /* ignore */ }
+    try { all.push(...await chrome.tabs.query({ url: lumoOnlineUrl })); } catch { /* ignore */ }
   }
   return all;
 }
@@ -116,8 +183,9 @@ document.querySelector("#copy-json").addEventListener("click", async () => {
   setStatus(`已复制 ${clips.length} 条采集记录`);
 });
 
-document.querySelector("#open-lumo").addEventListener("click", () => {
-  chrome.tabs.create({ url: "http://localhost:5176" });
+document.querySelector("#open-lumo").addEventListener("click", async () => {
+  const url = await getLumoUrl();
+  chrome.tabs.create({ url });
 });
 
 document.querySelector("#clear").addEventListener("click", async () => {
